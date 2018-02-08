@@ -1,3 +1,16 @@
+elevator
+=====
+
+An OTP application
+
+Build
+-----
+
+    $ rebar3 compile
+
+Notes
+-----
+
 # Elevator Project
 
 * Elevator drivers
@@ -12,3 +25,4 @@
 * Networking code
   -> Node-messaging
   -> Node-discovery
+
