@@ -40,7 +40,10 @@ Consensus reading
 -----
 
 https://raft.github.io/
+
 https://en.wikipedia.org/wiki/State_machine_replication
+
 https://people.cs.umass.edu/~arun/cs677/notes/week6.pdf
+
 http://www.cs.cornell.edu/fbs/publications/SMSurvey.pdf
 
