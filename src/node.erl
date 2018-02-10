@@ -6,6 +6,9 @@ start() ->
     register(networking, spawn(node, receive_msg, [])),
     io:format("me: ~p~n", [node()]).
 
+% connect to a node:
+% net_kernel:connect_node(Node).
+
 % Send message to all nodes
 broadcast(Msg) ->
     [{networking, N} ! Msg || N <- nodes()],
@@ -16,8 +19,6 @@ receive_msg() ->
     receive
         {message, Msg} ->
             io:format("received: ~p~n", [Msg]);
-        ping ->
-            io:format("got pinged! ~n"),
-            ok
     end,
     receive_msg().
+
