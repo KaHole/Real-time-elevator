@@ -13,7 +13,7 @@ VIKTIG:
 * Kanskje droppe rebar? hmmm..trenger vi supervisors? eller kan vi gjøre alt med heartbeats og Emakefile?
 
 * Elevator drivers
-  -> (one for sim, one for hardware)
+  -> (one driver works for both simulator and hardware (y))
 
 * Elevator logic
 
