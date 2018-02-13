@@ -3,6 +3,8 @@
 
 -define(DISCOVER_PORT, 8889).
 
+% Husk at PCene som testes må ha samme erlang cookie, denne kan sendes inn som argument! så mindre hassle med filene osv
+
 start() ->
     {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {broadcast, true}]),
     Listener = spawn(fun() -> listen(Socket) end),
