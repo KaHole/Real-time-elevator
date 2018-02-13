@@ -12,6 +12,11 @@ start() ->
 % Bruk   192.168.1.255:8889  for broadcast sending!
 
 
+broadcast(Socket) ->
+    io:format("~p~n", [node(self())]),
+    gen_udp:send(Socket, {192,168,1,255}, 8889, node(self())).
+
+
 listen(Socket) ->
     receive
         {udp, Socket, Host, Port, Bin} ->
