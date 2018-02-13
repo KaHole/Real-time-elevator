@@ -1,37 +1,31 @@
 -module(discover).
 -export([start/0]).
 
+-define(DISCOVER_PORT, 8889).
+
 start() ->
-    % binary | list   ... list might be really useful!
-    % {ok, Socket} = gen_udp:open(8889, [binary, {broadcast, true}]),
+    {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {broadcast, true}]),
+    Listener = spawn(fun() -> listen(Socket) end),
+    gen_udp:controlling_process(Socket, Listener),
+    spawn(fun() -> broadcast(Socket, nodes()) end).
 
-    spawn(fun() -> listen() end),
-    spawn(fun() -> broadcast() end).
-
-% Bruk   192.168.1.255:8889  for broadcast sending!
-
-
-broadcast() ->
-    {ok, Socket} = gen_udp:open(8777, [binary, {active, true}, {broadcast, true}]),
-    broadcast(Socket).
-
-
-broadcast(Socket) ->
-    io:format("~p~n", [node(self())]),
-    % gen_udp:send(Socket, {192, 168, 1, 255}, 8889, node(self())).
-    gen_udp:send(Socket, {192, 168, 1, 255}, 8889, "god dag\n"),
-
+broadcast(Socket, []) ->
+    gen_udp:send(Socket, {192, 168, 1, 255}, 8889, atom_to_list(node(self()))),
     timer:sleep(1000),
-    broadcast(Socket).
+    broadcast(Socket, nodes());
 
+broadcast(_, _) -> ok.
 
-listen() ->
-    {ok, Socket} = gen_udp:open(8889, [binary, {active, true}]),
-    listen(Socket).
+% Evig loop, starter broadcast igjen dersom node-listen tømmes
+% broadcast(Socket, _) ->
+%     timer:sleep(1000),
+%     broadcast(Socket, nodes()).
 
 listen(Socket) ->
     receive
-        {udp, Socket, Host, Port, Bin} ->
-            io:format("Klient Mottat: ~p~n", [Bin])
+        {udp, Socket, _, _, List} ->
+            io:format("Discovered ~p~nconnecting...~n", [List]),
+            net_kernel:connect_node(list_to_atom(List)),
+            io:format("Nodes: ~p~n", [nodes()])
     end,
     listen(Socket).
