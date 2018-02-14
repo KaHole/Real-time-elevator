@@ -1,24 +1,32 @@
 -module(node).
--export([start/0, receive_msg/0, broadcast/1]).
+-export([start/0, receive_msg/0]).
+
+% Denne kan flyttes ut til øverste nivå.. eller i app configen
+-define(COOKIE, "bananpose_999").
+    % erlang:set_cookie(self(), ?COOKIE),
 
 start() ->
-    % erlang:set_cookie(self(), Cookie),
-    register(networking, spawn(node, receive_msg, [])),
-    io:format("me: ~p~n", [node()]).
+    register(networking, spawn(node, listen, [])),
+    io:format("me: ~p~n", [node()]),
+    register(broadcast, spawn(fun() -> broadcast() end)).
 
-% connect to a node:
-% net_kernel:connect_node(Node).
+broadcast() ->
+    receive
+        {broadcast, Msg} ->
+            io:format("broadcasting: ~p~n", [Msg]),
+            [{networking, N} ! Msg || N <- nodes()]
+    end,
+    broadcast().
 
-% Send message to all nodes
-broadcast(Msg) ->
-    [{networking, N} ! Msg || N <- nodes()],
-    ok.
-
-% Receive loop
-receive_msg() ->
+listen() ->
     receive
         {message, Msg} ->
-            io:format("received: ~p~n", [Msg]);
+            io:format("received: ~p~n", [Msg])
     end,
-    receive_msg().
+    listen().
 
+% pattern for responding to messages immeadietly
+%
+% receive
+%   {From, Msg} ->
+%       From ! response

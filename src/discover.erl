@@ -12,7 +12,7 @@ start() ->
     spawn(fun() -> broadcast(Socket, nodes()) end).
 
 broadcast(Socket, []) ->
-    gen_udp:send(Socket, {192, 168, 1, 255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    gen_udp:send(Socket, {192,168,1,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
     timer:sleep(1000),
     broadcast(Socket, nodes());
 
