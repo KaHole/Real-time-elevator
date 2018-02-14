@@ -20,7 +20,7 @@ broadcast(_, _) -> ok.
 
 % Evig loop, starter broadcast igjen dersom node-listen tømmes
 % broadcast(Socket, _) ->
-%     timer:sleep(1000),
+%     timer:sleep(10000), % timeout nesten
 %     broadcast(Socket, nodes()).
 
 listen(Socket) ->
