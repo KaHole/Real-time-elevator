@@ -1,13 +1,12 @@
 -module(node).
--export([start/0, receive_msg/0]).
+-export([start/0]).
 
 % Denne kan flyttes ut til øverste nivå.. eller i app configen
 -define(COOKIE, "bananpose_999").
     % erlang:set_cookie(self(), ?COOKIE),
 
 start() ->
-    register(networking, spawn(node, listen, [])),
-    io:format("me: ~p~n", [node()]),
+    register(networking, spawn(fun() -> listen() end)),
     register(broadcast, spawn(fun() -> broadcast() end)).
 
 broadcast() ->
@@ -30,3 +29,25 @@ listen() ->
 % receive
 %   {From, Msg} ->
 %       From ! response
+
+
+% NOTES
+% Some kind of main/central module
+%
+% keeping track of state
+% loop(State) ->
+%   loop(ModifiedState).
+%
+%
+% State machine
+%
+% use pattern matching to determine state and to define legal actions on that state, great!
+%
+% machine({0, State}) ->
+%   ok.
+%
+% machine({1, State}) ->
+%   ok.
+%
+% machine({2, State}) ->
+%   ok.
