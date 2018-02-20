@@ -3,7 +3,7 @@
 
 % Denne kan flyttes ut til øverste nivå.. eller i app configen
 -define(COOKIE, "bananpose_999").
-    % erlang:set_cookie(self(), ?COOKIE),
+% erlang:set_cookie(self(), ?COOKIE),
 
 start() ->
     register(networking, spawn(fun() -> listen() end)),
