@@ -27,6 +27,8 @@ listen(Socket) ->
     receive
         {udp, Socket, _, _, List} ->
             io:format("Discovered ~p~nconnecting...~n", [List]),
+            % NB! Her kan vi sende world-state med en gang, slik at når en node kommer tilbake så får den staten til alle med en gang.
+            % kan bare erstatte connect med en melding i stedet, connect er bare en "tom" melding
             net_kernel:connect_node(list_to_atom(List)),
             io:format("Nodes: ~p~n", [nodes()])
     end,
