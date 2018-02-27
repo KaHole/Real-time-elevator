@@ -6,24 +6,27 @@ Build
 
     $ rebar3 compile
 
-Notes
------
 
-VIKTIG:
-* Kanskje droppe rebar? hmmm..trenger vi supervisors? eller kan vi gjøre alt med heartbeats og Emakefile?
 
-* Elevator drivers
-  -> (one driver works for both simulator and hardware (y))
+Modules
+----
+
+* Node discovery
+
+* Networking
+    - heartbeats
+    - broadcast
+
+* Consensus state machine
+* ~~Hall request assigner (premade)~~
 
 * Elevator logic
+* ~~Elevator driver (premade)~~
 
-* Order logic
+Records
+----
+* Elevator state
 
-* Consensus stuff
-
-* Networking code
-  -> Node-messaging
-  -> Node-discovery
 
 Learning Resources
 -----
