@@ -12,7 +12,8 @@ start() ->
     spawn(fun() -> broadcast(Socket, nodes()) end).
 
 broadcast(Socket, []) ->
-    gen_udp:send(Socket, {192,168,1,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    % gen_udp:send(Socket, {192,168,1,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    gen_udp:send(Socket, {172,20,10,15}, ?DISCOVER_PORT, atom_to_list(node(self()))),
     timer:sleep(1000),
     broadcast(Socket, nodes());
 
@@ -29,6 +30,8 @@ listen(Socket) ->
             io:format("Discovered ~p~nconnecting...~n", [List]),
             % NB! Her kan vi sende world-state med en gang, slik at når en node kommer tilbake så får den staten til alle med en gang.
             % kan bare erstatte connect med en melding i stedet, connect er bare en "tom" melding
+
+            io:format("node atom: ~p~n", [list_to_atom(List)]),
             net_kernel:connect_node(list_to_atom(List)),
             io:format("Nodes: ~p~n", [nodes()])
     end,
