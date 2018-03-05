@@ -19,6 +19,7 @@ broadcast(Socket, []) ->
 
 broadcast(_, _) -> ok.
 
+% Gode ideer her:
 % Evig loop, starter broadcast igjen dersom node-listen tømmes
 % broadcast(Socket, _) ->
 %     timer:sleep(10000), % timeout nesten
