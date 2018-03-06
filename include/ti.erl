@@ -8,7 +8,8 @@
 
 start() ->
 
-    El = #elevator{},
-    Tmp = #worldstate{elevators=[El]},
+    State = #elevator{},
+
+    Tmp = #worldstate{elevators=[State]},
 
     io:format("~p~n", [Tmp]).

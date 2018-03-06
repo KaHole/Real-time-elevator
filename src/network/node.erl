@@ -2,34 +2,29 @@
 -export([start/0]).
 
 % Denne kan flyttes ut til øverste nivå.. eller i app configen
--define(COOKIE, "bananpose_999").
+% -define(COOKIE, "bananpose_999").
 % erlang:set_cookie(self(), ?COOKIE),
 
 start() ->
-    register(networking, spawn(fun() -> listen() end)),
-    register(broadcast, spawn(fun() -> broadcast() end)).
+    register(node, spawn(fun() -> loop() end)),
 
-broadcast() ->
+loop() ->
     receive
         {broadcast, Msg} ->
             io:format("broadcasting: ~p~n", [Msg]),
-            [{networking, N} ! Msg || N <- nodes()]
-    end,
-    broadcast().
+            [{node, N} ! {message, Msg} || N <- nodes()];
 
-listen() ->
-    receive
         {message, Msg} ->
+            % TODO: Videresend til coordinator basically
             io:format("received: ~p~n", [Msg])
     end,
-    listen().
+    loop().
 
 % pattern for responding to messages immeadietly
 %
 % receive
 %   {From, Msg} ->
 %       From ! response
-
 
 % NOTES
 % Some kind of main/central module
