@@ -1,14 +1,11 @@
 #Husk å sjekke mot erlang_interface eksempelet i repoen!
 
-elevator
+elevator (電梯)
 =====
 
 Build
 -----
-
     $ rebar3 compile
-
-
 
 Modules
 ----
