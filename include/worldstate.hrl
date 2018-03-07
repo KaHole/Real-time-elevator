@@ -8,7 +8,7 @@
 }).
 
 -record(hallRequest, {
-    state = done ::atom(),
+    state = new ::atom(), % new, pending, done
     observedBy = [] ::atom()
 }).
 
@@ -17,7 +17,7 @@
 %     down ::#hallRequest{},
 % }).
 
--record(worldstate, {
+-record(worldState, {
     hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}],
     elevators = [] ::[#elevator{}]
 }).

@@ -6,6 +6,8 @@
 -export([set_motor_direction/2, set_order_button_light/4, set_floor_indicator/2, set_door_open_light/2, set_stop_button_light/2, get_order_button_state/3, get_floor_sensor_state/1, get_stop_button_state/1, get_obstruction_switch_state/1]).
 -export([init/1, handle_cast/2, handle_call/3]).
 
+-define(CALL_TIMEOUT, 1000).
+
 start() ->
     gen_server:start(?MODULE, [{127,0,0,1}, 15657], []).
     
@@ -106,20 +108,20 @@ handle_cast({set_stop_button_light, off}, Socket) ->
 		  
 handle_call({get_order_button_state, Floor, hall_up}, _From, Socket) ->
     gen_tcp:send(Socket, [6, 0, Floor, 0]),
-    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, 1),
+    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT),
     {reply, State, Socket};
 handle_call({get_order_button_state, Floor, hall_down}, _From, Socket) ->
     gen_tcp:send(Socket, [6, 1, Floor, 0]),
-    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, 1),
+    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT),
     {reply, State, Socket};
 handle_call({get_order_button_state, Floor, cab}, _From, Socket) ->
     gen_tcp:send(Socket, [6, 2, Floor, 0]),
-    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, 1),
+    {ok, [6, State, 0, 0]} = gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT),
     {reply, State, Socket};
 
 handle_call(get_floor_sensor_state, _From, Socket) ->
     gen_tcp:send(Socket, [7, 0, 0, 0]),
-    State = case gen_tcp:recv(Socket, 4, 1) of
+    State = case gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT) of
 			   {ok, [7, 0, _, 0]} -> between_floors;
 			   {ok, [7, 1, Floor, 0]} -> Floor
 		       end,
@@ -127,7 +129,7 @@ handle_call(get_floor_sensor_state, _From, Socket) ->
 
 handle_call(get_stop_button_state, _From, Socket) -> 
     gen_tcp:send(Socket, [8, 0, 0, 0]),
-    StopButtonState = case gen_tcp:recv(Socket, 4, 1) of
+    StopButtonState = case gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT) of
 			   {ok, [8, 0, 0, 0]} -> inactive;
 			   {ok, [8, 1, 0, 0]} -> active
 			end,
@@ -135,7 +137,7 @@ handle_call(get_stop_button_state, _From, Socket) ->
 
 handle_call(get_obstruction_switch_state, _From, Socket) -> 
     gen_tcp:send(Socket, [9, 0, 0, 0]),
-    ObstructionState = case gen_tcp:recv(Socket, 4, 1) of
+    ObstructionState = case gen_tcp:recv(Socket, 4, ?CALL_TIMEOUT) of
 			   {ok, [9, 0, 0, 0]} -> inactive;
 			   {ok, [9, 1, 0, 0]} -> active
 			end,

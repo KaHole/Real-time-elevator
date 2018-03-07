@@ -9,19 +9,32 @@
 % så kan ting restartes enklere og
 
 start() ->
-    node:start(),
-    elevator_logic:start(),
+    % node:start(),
+    % elevator_logic:start(),
 
-    WorldState = #worldstate{},
+    WorldState = #worldState{},
 
     register(coordinator, spawn(fun() -> observe(WorldState) end)),
 
+    % test
+    coordinator ! {elevator_update, #elevator{id=node()}},
     ok.
 
 
 observe(WorldState) ->
 
-    broadcast ! "yoyoyoy",
+    receive
+
+        {elevator_update, Elevator} when Elevator#elevator.id =:= node() ->
+            io:format("local elevator~n");
+            % 1. update model
+            % 2. then send
+
+        {elevator_update, Elevator} -> io:format("foreign elevator~n")
+
+    end,
+
+
     observe(WorldState).
 
 

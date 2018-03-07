@@ -25,14 +25,6 @@ loop() ->
 % receive
 %   {From, Msg} ->
 %       From ! response
-
-% NOTES
-% Some kind of main/central module
-%
-% keeping track of state
-% loop(State) ->
-%   loop(ModifiedState).
-%
 %
 % State machine
 %
