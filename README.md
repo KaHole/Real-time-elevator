@@ -1,3 +1,5 @@
+#Husk å sjekke mot erlang_interface eksempelet i repoen!
+
 elevator
 =====
 
