@@ -10,17 +10,17 @@ Build
 Modules
 ----
 
-[ ] Networking
+- [ ] Networking
 
-[ ] Coordinator (main)
-[ ] Consensus state machine
-[ ] Hall request assigner integration (50%)
-[ ] Elevator logic
+- [ ] Coordinator (main)
+- [ ] Consensus state machine
+- [ ] Hall request assigner integration (50%)
+- [ ] Elevator logic
 
-[ ] Heartbeats / fault-recovery / tolerance
+- [ ] Heartbeats / fault-recovery / tolerance
 
-[x] Node discovery
-[x] Elevator driver (premade)
+- [x] Node discovery
+- [x] Elevator driver (premade)
 
 
 ![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
