@@ -11,17 +11,18 @@ Modules
 ----
 ![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
 
-* Node discovery
 
-* Networking
-    - heartbeats
-    - broadcast
+[] Networking
 
-* Consensus state machine
-* ~~Hall request assigner (premade)~~
+[] Coordinator (main)
+[] Consensus state machine
+[] Hall request assigner integration (50%)
+[] Elevator logic
 
-* Elevator logic
-* ~~Elevator driver (premade)~~
+[] Heartbeats / fault-recovery / tolerance
+
+[x] Node discovery
+[x] Elevator driver (premade)
 
 Records
 ----

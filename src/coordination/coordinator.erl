@@ -38,7 +38,6 @@ observe(WorldState) ->
     observe(WorldState).
 
 
-
 % ----
 % % To check if alive when sending message
 % % process can be restarted at the undefined match
