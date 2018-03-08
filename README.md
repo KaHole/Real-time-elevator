@@ -1,6 +1,4 @@
-#Husk å sjekke mot erlang_interface eksempelet i repoen!
-
-elevator (電梯)
+elevator project (電梯)
 =====
 
 Build
