@@ -9,8 +9,6 @@ Build
 
 Modules
 ----
-![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
-
 
 [] Networking
 
@@ -24,10 +22,8 @@ Modules
 [x] Node discovery
 [x] Elevator driver (premade)
 
-Records
-----
-* Elevator state
 
+![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
 
 Learning Resources
 -----
