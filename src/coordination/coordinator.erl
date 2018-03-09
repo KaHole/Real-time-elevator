@@ -38,6 +38,8 @@ observe(WorldState) ->
 
     observe(WorldState).
 
+% updateElevator(Elevator) when Elevator#elevator.id =:= node() ->
+
 
 % ----
 % % To check if alive when sending message
