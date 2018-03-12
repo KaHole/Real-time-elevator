@@ -24,14 +24,14 @@ observe(WorldState) ->
 
     receive
 
-        {elevator_update, Elevator} when Elevator#elevator.id =:= node() ->
+        {elevator_update, Elevator} ->
             io:format("local elevator~n");
             % 1. update model
             % 2. then send
 
             % Finn optimal datastruktur, eller metode for å oppdatere en elevator raskt.. jesus 
 
-        {elevator_update, Elevator} -> io:format("foreign elevator~n")
+        {elevator_update, {HallRequests, Elevator}} -> io:format("foreign elevator~n")
 
     end,
 

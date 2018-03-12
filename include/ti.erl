@@ -10,6 +10,15 @@ start() ->
 
     State = #elevator{},
 
-    Tmp = #worldstate{elevators=[State]},
+    Tmp = #worldState{elevators=[State]},
 
-    io:format("~p~n", [Tmp]).
+    io:format("~p~n", [Tmp]),
+    go(State).
+
+
+go(E#elevator{}) ->
+    io:format("short syntax~n"),
+    E;
+
+go(E) when is_record(E, elevator) ->
+    E.
