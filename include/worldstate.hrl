@@ -19,5 +19,6 @@
 % lokal state meldingsformat
 -record(stateMsg, {
     hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}],
-    elevator :: atom()|#elevator{}
+    elevator :: [atom()|#elevator{}]
 }).
+
