@@ -6,7 +6,7 @@
 % erlang:set_cookie(self(), ?COOKIE),
 
 start() ->
-    register(node, spawn(fun() -> loop() end)),
+    register(node, spawn(fun() -> loop() end)).
 
 loop() ->
     receive

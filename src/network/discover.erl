@@ -32,6 +32,8 @@ listen(Socket) ->
             % NB! Her kan vi sende world-state med en gang, slik at når en node kommer tilbake så får den staten til alle med en gang.
             % kan bare erstatte connect med en melding i stedet, connect er bare en "tom" melding
 
+            % TODO: Dont connect to self! ..?
+
             io:format("node atom: ~p~n", [list_to_atom(List)]),
             % net_kernel:connect_node(list_to_atom(List)),
             {test, list_to_atom(List)} ! ping,

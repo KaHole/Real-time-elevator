@@ -25,28 +25,24 @@ observe(WorldState) ->
     receive
 
         {elevator_update, Elevator} ->
-            io:format("local elevator~n");
+            io:format("local elevator~n"),
             % 1. update model
             % 2. then send
 
-            % Finn optimal datastruktur, eller metode for å oppdatere en elevator raskt.. jesus 
+            lists:keyreplace(node(), 1, WorldState#worldState.elevators, {node(), Elevator});
 
-        {elevator_update, {HallRequests, Elevator}} -> io:format("foreign elevator~n")
+
+        % {elevator_update, {HallRequests, Elevator}} -> io:format("foreign elevator~n")
+        #stateMsg{} = StateMsg ->
+            io:format("foreign elevator~n"),
+            % lists:keyreplace(StateMsg#stateMsg.elevator , 1, WorldState#worldState.elevators, {node(), Elevator})
+        % ForeignState#localState{} -> io:format("foreign elevator~n")
 
     end,
 
 
     observe(WorldState).
 
-% updateElevator(Elevator) when Elevator#elevator.id =:= node() ->
 
-
-% ----
-% % To check if alive when sending message
-% % process can be restarted at the undefined match
-
-% send(undefined) -> ok;
-
-% send(Pid, Msg) ->
-%     Pid ! Msg.
-
+% BIBELEN:
+% WHEN CALLING HALL_REQUEST_ASSIGNER, FILTER ON nodes() TO ONLY SEND THE ACTIVE ONES!!
