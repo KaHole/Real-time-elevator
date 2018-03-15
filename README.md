@@ -4,26 +4,34 @@ elevator project (電梯)
 
 Real-time elevator system for TTK4145
 
-Build
------
-    $ rebar3 compile
-
 Modules
 ----
 
-- [ ] Networking
-
 - [ ] Coordinator (main)
-- [ ] Consensus state machine
-- [ ] Hall request assigner integration (50%)
+- [ ] Consensus state machine (50%)
 - [ ] Elevator logic
 
 - [ ] Heartbeats / fault-recovery / tolerance
 
+- [x] Hall request assigner integration
+- [x] Networking
 - [x] Node discovery
 - [x] Elevator driver (premade)
 
+
+##Build & Run
+
+    $ rebar3 shell --sname one --apps elevator
+
+##Build
+
+    $ rebar3 compile
+
+----
+
 ![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
+
+----
 
 Learning Resources
 -----

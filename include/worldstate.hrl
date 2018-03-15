@@ -16,9 +16,3 @@
     elevators = [] ::[atom()|#elevator{}]
 }).
 
-% lokal state meldingsformat
--record(stateMsg, {
-    hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}],
-    elevator :: [atom()|#elevator{}]
-}).
-
