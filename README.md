@@ -19,12 +19,12 @@ Modules
 - [x] Elevator driver (premade)
 
 
-##Build & Run
-
+Build & Run
+----
     $ rebar3 shell --sname one --apps elevator
 
-##Build
-
+Build
+----
     $ rebar3 compile
 
 ----
