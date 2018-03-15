@@ -61,6 +61,7 @@ observe(WorldState) ->
     end,
 
     % consense if necessary
+    %
     %   -> and if changes, we have to broadcasr again
     %       -> make sure this doesnt become a clusterfuck
     %           the main loop might need some restructuring
