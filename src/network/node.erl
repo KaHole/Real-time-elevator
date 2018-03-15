@@ -10,8 +10,9 @@
 % TRENGER IKKE DENNE, BARE ADDRESSER COORDINATOR DIREKTE??? !!
 
 
-% start() ->
-%     register(node, spawn(fun() -> loop() end)).
+ start() ->
+     ok.
+     % register(node, spawn(fun() -> loop() end)).
 
 % loop() ->
 %     receive

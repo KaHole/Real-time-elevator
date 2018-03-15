@@ -27,7 +27,7 @@ start(_StartType, _StartArgs) ->
     
     % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
     discover:start(),
-    node:start(),
+    % node:start(),
     coordinator:start(WorldState),
 
     Ne = make_elevator(?NUM_FLOORS),

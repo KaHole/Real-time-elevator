@@ -47,7 +47,7 @@ observe(WorldState) ->
             
             % TODO: broadcast new state!!
 
-            _HallRequests = add_hall_requests(WorldState#worldState.hallRequests);
+            _HallRequests = add_hall_requests(WorldState, HallButtons);
 
         {elevator_update, Id, Elevator, HallRequests} ->
             io:format("foreign elevator~n"),
@@ -78,11 +78,11 @@ update_elevator_list(WorldState, Id, Elevator) ->
 add_hall_requests(WorldState, HallButtons) ->
     % create hall_requests based on HallButtons
     %   ignore if there is an existing hall_request with certain states i guess?
-    .
+    ok.
 
 update_hall_requests(WorldState, HallRequests) ->
     % merge hall requests from another elevators message
-    .
+    ok.
 
 
 broadcast_state(Elevator, HallRequests) ->
