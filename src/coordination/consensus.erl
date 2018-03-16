@@ -16,8 +16,6 @@ consenseFloor({HallUp, HallDown}) ->
     {consenseRequest(HallUp), consenseRequest(HallDown)}.
 
 
-% consenseRequest(HallRequest) when HallRequest#hallRequest.state =:= nothing -> HallRequest;
-
 consenseRequest(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 
 consenseRequest(#hallRequest{state=State, observedBy=ObservedBy}) ->

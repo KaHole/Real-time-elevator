@@ -3,8 +3,6 @@
 
 -define(DISCOVER_PORT, 8889).
 
-% Husk at PCene som testes må ha samme erlang cookie, denne kan sendes inn som argument! så mindre hassle med filene osv
-
 start() ->
     {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {reuseaddr, true}, {broadcast, true}]),
     Listener = spawn(fun() -> listen(Socket) end),
@@ -14,7 +12,6 @@ start() ->
 broadcast(Socket, []) ->
     % gen_udp:send(Socket, {192,168,1,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
     % gen_udp:send(Socket, {172,20,10,15}, ?DISCOVER_PORT, atom_to_list(node(self()))),
-
     gen_udp:send(Socket, {129,241,187,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
 
     timer:sleep(1000),
@@ -32,10 +29,6 @@ listen(Socket) ->
     receive
         {udp, Socket, _, _, List} ->
             io:format("Discovered ~p~n", [List]),
-            % NB! Her kan vi sende world-state med en gang, slik at når en node kommer tilbake så får den staten til alle med en gang.
-            % kan bare erstatte connect med en melding i stedet, connect er bare en "tom" melding
-
-            % TODO: Dont connect to self! ..?
 
             DiscoveredNode = list_to_atom(List),
 

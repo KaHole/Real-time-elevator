@@ -15,13 +15,14 @@
 %% Application callbacks
 -export([start/2, stop/1]).
 
-
 %%====================================================================
 %% API
 %%====================================================================
 
 start(_StartType, _StartArgs) ->
 
+    % -define(COOKIE, "bananpose_999").
+    % erlang:set_cookie(self(), ?COOKIE),
 
     WorldState = make_worldState(?NUM_FLOORS),
     
@@ -32,9 +33,9 @@ start(_StartType, _StartArgs) ->
 
     Ne = make_elevator(?NUM_FLOORS),
     Ue = Ne#elevator{floor=3, direction=up, behaviour=moving},
-    coordinator ! {local_elevator_update, Ue, []},
-    coordinator ! {local_elevator_update, Ue, []},
-    coordinator ! {local_elevator_update, Ue, []},
+    coordinator ! {local_elevator_update, Ue, [{true, false}, {false, false}, {false, false}, {false, false} ]},
+    % coordinator ! {local_elevator_update, Ue, []},
+    % coordinator ! {local_elevator_update, Ue, []},
 
     elevator_sup:start_link().
 
@@ -47,7 +48,7 @@ stop(_State) ->
 %%====================================================================
 
 %%
-%% MOVE this??
+%% MOVE to worldstate.hrl .. will have to move includes beneath exports, but thats fine!
 make_worldState(NumFloors) ->
     
     HallRequests = lists:duplicate(NumFloors, {#hallRequest{}, #hallRequest{}}),

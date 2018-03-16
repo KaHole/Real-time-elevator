@@ -1,17 +1,14 @@
 -module(node).
--export([start/0]).
+% -export([start/0]).
 
 % Denne kan flyttes ut til øverste nivå.. eller i app configen
 % -define(COOKIE, "bananpose_999").
 % erlang:set_cookie(self(), ?COOKIE),
 
-
-
 % TRENGER IKKE DENNE, BARE ADDRESSER COORDINATOR DIREKTE??? !!
 
-
- start() ->
-     ok.
+ % start() ->
+ %     ok.
      % register(node, spawn(fun() -> loop() end)).
 
 % loop() ->
@@ -26,10 +23,8 @@
 %     end,
 %     loop().
 
-
-broadcast_state(Elevator, HallRequests) ->
-    [{coordinator, N} ! {elevator_update, node(), Elevator, HallRequests} || N <- nodes()].
-
+% broadcast_state(Elevator, HallRequests) ->
+%     [{coordinator, N} ! {elevator_update, node(), Elevator, HallRequests} || N <- nodes()].
 
 % pattern for responding to messages immeadietly
 %
@@ -37,15 +32,3 @@ broadcast_state(Elevator, HallRequests) ->
 %   {From, Msg} ->
 %       From ! response
 %
-% State machine
-%
-% use pattern matching to determine state and to define legal actions on that state, great!
-%
-% machine({0, State}) ->
-%   ok.
-%
-% machine({1, State}) ->
-%   ok.
-%
-% machine({2, State}) ->
-%   ok.

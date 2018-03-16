@@ -7,12 +7,11 @@
 }).
 
 -record(hallRequest, {
-    state = nothing ::atom(), % no_call, new, accepted
+    state = nothing ::atom(), % nothing, new, accepted
     observedBy = [] ::[atom()]
 }).
 
 -record(worldState, {
-    hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}],
-    elevators = [] ::[atom()|#elevator{}]
+    hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}], % list of tuples of up/down hall-request pairs
+    elevators = [] ::[atom()|#elevator{}] % tuple of node-id and elevator object
 }).
-
