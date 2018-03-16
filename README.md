@@ -27,6 +27,10 @@ Build
 ----
     $ rebar3 compile
 
+Make binary
+----
+    $ rebar3 release
+
 ----
 
 ![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
