@@ -27,17 +27,17 @@ start(_StartType, _StartArgs) ->
     WorldState = make_world_state(?NUM_FLOORS),
     
 
-    io:format("~p~n", [hall_request_assigner:test()]),
+    % io:format("~p~n", [hall_request_assigner:test()]),
 
-    % % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
-    % discover:start(),
-    % coordinator:start(WorldState),
+    % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
+    discover:start(),
+    coordinator:start(WorldState),
 
-    % Ne = make_elevator(?NUM_FLOORS),
-    % Ue = Ne#elevator{floor=3, direction=up, behaviour=moving},
-    % coordinator ! {local_elevator_update, Ue, [{true, false}, {false, false}, {false, false}, {false, false} ]},
-    % % coordinator ! {local_elevator_update, Ue, []},
-    % % coordinator ! {local_elevator_update, Ue, []},
+    Ne = make_elevator(?NUM_FLOORS),
+    Ue = Ne#elevator{floor=3, direction=up, behaviour=moving},
+    coordinator ! {local_elevator_update, Ue, [{true, false}, {false, false}, {false, false}, {false, false} ]},
+    % coordinator ! {local_elevator_update, Ue, []},
+    % coordinator ! {local_elevator_update, Ue, []},
 
     elevator_sup:start_link().
 

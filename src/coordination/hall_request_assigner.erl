@@ -9,7 +9,7 @@
 % Tester hall_request_assigner for debugging bare
 test() ->
     Elevator = {node(), #elevator{cabRequests=[false, false, false, false], floor=1}},
-    HallRequests = [{#hallRequest{}, #hallRequest{}},
+    HallRequests = [{#hallRequest{state=accepted}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}}],
@@ -26,9 +26,8 @@ assign({Elevators, HallRequests}) ->
     ActiveElevators = lists:filter(fun({Id, _}) -> lists:member(Id, ActiveNodes) end, Elevators),
 
     JsonState = "'{\"hallRequests\": " ++
-    json(lists:map(fun({HallUp, HallDown}) -> [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end, HallRequests))
-
-    ++ ", \"states\" : {" ++
+    hall_requests_to_json(HallRequests) ++
+    ", \"states\" : {" ++
     lists:foldr(fun(Elev, Acc) ->
                         Acc ++ ", " ++
                         elevator_to_json(Elev) end,
@@ -36,7 +35,7 @@ assign({Elevators, HallRequests}) ->
                     lists:nthtail(1, ActiveElevators))
     ++ "}}'",
 
-    io:fwrite(JsonState ++ "~n"),
+    % io:fwrite(JsonState ++ "~n"),
 
     Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
     maps:get(list_to_binary(atom_to_list(node())), Data).
@@ -44,12 +43,17 @@ assign({Elevators, HallRequests}) ->
 
 % JSONifiers
 
-elevator_to_json({Id, Elev}) ->
+hall_requests_to_json(HallRequests) ->
+    json(lists:map(fun({HallUp, HallDown}) ->
+                           [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end,
+                   HallRequests)).
+
+elevator_to_json({Id, Elevator}) ->
     "\"" ++ atom_to_list(Id) ++ "\" : {" ++
-    "\"behaviour\": \"" ++ atom_to_list(Elev#elevator.behaviour) ++
-    "\", \"floor\": " ++ integer_to_list(Elev#elevator.floor) ++
-    ", \"direction\": \"" ++ atom_to_list(Elev#elevator.direction) ++
-    "\", \"cabRequests\": " ++ json(Elev#elevator.cabRequests) ++
+    "\"behaviour\": \"" ++ atom_to_list(Elevator#elevator.behaviour) ++
+    "\", \"floor\": " ++ integer_to_list(Elevator#elevator.floor) ++
+    ", \"direction\": \"" ++ atom_to_list(Elevator#elevator.direction) ++
+    "\", \"cabRequests\": " ++ json(Elevator#elevator.cabRequests) ++
     "}".
 
 json(Data) ->
