@@ -15,10 +15,15 @@ test() ->
                     {#hallRequest{}, #hallRequest{}}],
     Elevators = [Elevator],
     assign({Elevators, HallRequests}).
+    % jsone:encode([false,false,false,false]).
 
 %-----------------------------
 
 assign({Elevators, HallRequests}) ->
+
+    % Filters on active nodes, only active nodes should be taken in account
+    ActiveNodes = nodes(),
+    ActiveElevators = lists:filter(fun(E) -> lists:member(E, ActiveNodes) end, Elevators),
 
     JsonState = "'{\"hallRequests\": [" ++
     lists:foldr(fun(Hall, Acc) ->
@@ -31,8 +36,8 @@ assign({Elevators, HallRequests}) ->
     lists:foldr(fun(Elev, Acc) ->
                         Acc ++ ", " ++
                         elevator_to_json(Elev) end,
-                    elevator_to_json(lists:nth(1, Elevators)),
-                    lists:nthtail(1, Elevators))
+                    elevator_to_json(lists:nth(1, ActiveElevators)),
+                    lists:nthtail(1, ActiveElevators))
     ++ "}}'",
 
     % io:fwrite(JsonState ++ "~n"),
@@ -46,9 +51,9 @@ assign({Elevators, HallRequests}) ->
 bs(true) -> "true";
 bs(_) -> "false".
 
-hall_to_json({HallRequest1, HallRequest2}) ->
-    "[" ++ bs(HallRequest1#hallRequest.state =:= accepted) ++
-    "," ++ bs(HallRequest2#hallRequest.state =:= accepted) ++ "]".
+hall_to_json({HallUp, HallDown}) ->
+    "[" ++ bs(HallUp#hallRequest.state =:= accepted) ++
+    "," ++ bs(HallDown#hallRequest.state =:= accepted) ++ "]".
 
 elevator_to_json({Id, Elev}) ->
     "\"" ++ atom_to_list(Id) ++ "\" : {" ++

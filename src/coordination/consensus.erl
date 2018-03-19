@@ -2,29 +2,57 @@
 
 -include("../../include/worldstate.hrl").
 
--export([consense/1, test/0]).
-
+-export([consense/2, merge_hall_request_lists/2, test/0]).
 
 test() ->
-    consense([{#hallRequest{state=new}, #hallRequest{state=nothing}}]).
+    consense([{#hallRequest{state=nothing}, #hallRequest{state=nothing}}], [{#hallRequest{state=new, observedBy=[node()]}, #hallRequest{state=nothing}}]).
+
+%%====================================================================
+%% API ... skal vi ha dette overalt??
+%%====================================================================
+
+consense(HallRequests, ExternalHallRequests) ->
+
+    MergedHallRequests = merge_hall_request_lists(HallRequests, ExternalHallRequests),
+    lists:map(fun(F) -> consense_floor(F) end, MergedHallRequests).
+
+merge_hall_request_lists(HallRequests, ExternalHallRequests) ->
+    lists:map(fun({Floor1, Floor2}) -> merge_floors(Floor1, Floor2) end, lists:zip(HallRequests, ExternalHallRequests)).
+
+%%====================================================================
+%% Internal functions
+%%====================================================================
+
+merge_floors({HallUp1, HallDown1}, {HallUp2, HallDown2}) ->
+    {merge_requests(HallUp1, HallUp2), merge_requests(HallDown1, HallDown2)}.
+
+merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=nothing}) -> HallRequest1;
+
+merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallRequest2) -> HallRequest2;
+
+merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
+
+merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
+
+    ObsBySet1 = sets:from_list(ObservedBy1),
+    ObsBySet2 = sets:from_list(ObservedBy2),
+    _ObservedBy = sets:to_list(sets:union(ObsBySet1, ObsBySet2)),
+    HallRequest1#hallRequest{observedBy=_ObservedBy}.
 
 
-consense(HallRequests) ->
-    lists:map(fun(F) -> consenseFloor(F) end, HallRequests).
-
-consenseFloor({HallUp, HallDown}) ->
-    {consenseRequest(HallUp), consenseRequest(HallDown)}.
+consense_floor({HallUp, HallDown}) ->
+    {consense_request(HallUp), consense_request(HallDown)}.
 
 
-consenseRequest(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
+consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 
-consenseRequest(#hallRequest{state=State, observedBy=ObservedBy}) ->
+consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
     _ObservedBy = observe(ObservedBy, node()),
     Nodes = nodes(),
 
     if
-        length(Nodes) == length(_ObservedBy) -> 
+        length(Nodes) + 1 == length(_ObservedBy) -> 
             #hallRequest{state=advance(State), observedBy=[node()]};
         true ->
             #hallRequest{state=State, observedBy=_ObservedBy}
