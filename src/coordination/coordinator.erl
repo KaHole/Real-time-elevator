@@ -2,17 +2,36 @@
 -include("../../include/worldstate.hrl").
 -export([start/1]).
 
-start(WorldState) ->
-    register(coordinator, spawn(fun() -> observe(WorldState) end)).
+start({Elevators, HallRequests}) ->
+    register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
 % BIBELEN:
 % WHEN CALLING HALL_REQUEST_ASSIGNER, FILTER ON nodes() TO ONLY SEND THE ACTIVE ONES!!
 
+
+% observe() ->
+
+%     local_elevator_update->
+%         update_elevator.
+%         add_hall_requests.
+%         broadcast_state.
+
+%     elevator_update ->
+%         update_elevator.
+%         update_hall_requests
+%         consense
+%         broadcast_state
+%         assign_hall_requests
+%         send_hall_requests_to_local
+
 % trenger kanskje ikke worldState record.. mer rot bare? hmm 50-50
-observe(#worldState{elevators=Elevators, hallRequests=HallRequests}) ->
+
+observe(Elevators, HallRequests) ->
 
     receive
         {local_elevator_update, Elevator, HallButtons} ->
+
+            io:fwrite("local elevator ~n"),
 
             _Elevators = update_elevator(Elevators, node(), Elevator),
             _HallRequests = add_hall_requests(HallRequests, HallButtons),
@@ -26,29 +45,32 @@ observe(#worldState{elevators=Elevators, hallRequests=HallRequests}) ->
             _Elevators = update_elevator(Elevators, Id, Elevator),
 
             %TODO: Maybe put more of this stuff in the consense module, makes it a lot tidier here as well.
-            _ChangeThis_HallRequests = update_hall_requests(HallRequests, NewHallRequests),
+            MergedHallRequests = update_hall_requests(HallRequests, NewHallRequests),
 
-            _HallRequests = consensus:consense(_ChangeThis_HallRequests),
+            _HallRequests = consensus:consense(MergedHallRequests),
 
+            %TODO: is this local elevator data redundant / stale.. does it matter?
             {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
             broadcast_state(LocalElevator, _HallRequests),
 
             %TODO: prune/filter on active nodes! only active nodes should be taken in account
-            AssignedHallRequests = hall_request_assigner:assign(_HallRequests),
+            %TODO: Do this in hall_assigner instead?!!
+            ActiveElevators = lists:filter( , _Elevators),
+            AssignedHallCalls = hall_request_assigner:assign({ActiveElevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
-            elevator_logic ! {hall_requests, AssignedHallRequests}
+            elevator_logic ! {hall_requests, AssignedHallCalls}
     end,
 
-    observe(#worldState{elevators=_Elevators, hallRequests=_HallRequests}).
+    observe(_Elevators, _HallRequests).
 
 
 update_elevator(Elevators, Id, Elevator) ->
-    lists:keyreplace(Id, 1, Elevators, {Id, Elevator}).
+    lists:keystore(Id, 1, Elevators, {Id, Elevator}).
 
 add_hall_requests(HallRequests, HallButtons) ->
 
-                                    %TODO: Warning! this might need to be square brackets, same behaviour, doesnt matter really, but watch out
+                                %TODO: Warning! this might need to be square brackets, same behaviour, doesnt matter really, but watch out
     NewHallRequests = lists:map(fun({HallUp, HallDown}) ->
                                         {generate_hall_request(HallUp), generate_hall_request(HallDown)}
                                 end, HallButtons),

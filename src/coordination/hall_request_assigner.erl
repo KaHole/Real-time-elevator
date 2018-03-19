@@ -9,29 +9,30 @@
 % Tester hall_request_assigner for debugging bare
 test() ->
     Elevator = {node(), #elevator{cabRequests=[false, false, false, false], floor=1}},
-    WorldState = #worldState{hallRequests=[{#hallRequest{}, #hallRequest{}},
-                                           {#hallRequest{}, #hallRequest{}},
-                                           {#hallRequest{}, #hallRequest{}},
-                                           {#hallRequest{}, #hallRequest{}}], elevators=[Elevator]},
-    assign(WorldState).
+    HallRequests = [{#hallRequest{}, #hallRequest{}},
+                    {#hallRequest{}, #hallRequest{}},
+                    {#hallRequest{}, #hallRequest{}},
+                    {#hallRequest{}, #hallRequest{}}],
+    Elevators = [Elevator],
+    assign({Elevators, HallRequests}).
 
 %-----------------------------
 
-assign(WorldState) ->
+assign({Elevators, HallRequests}) ->
 
     JsonState = "'{\"hallRequests\": [" ++
     lists:foldr(fun(Hall, Acc) ->
                         Acc ++ ", " ++
                         hall_to_json(Hall) end,
-                    hall_to_json(lists:nth(1, WorldState#worldState.hallRequests)), % First element in list
-                    lists:nthtail(1, WorldState#worldState.hallRequests))
+                    hall_to_json(lists:nth(1, HallRequests)), % First element in list
+                    lists:nthtail(1, HallRequests))
 
     ++ "], \"states\" : {" ++
     lists:foldr(fun(Elev, Acc) ->
                         Acc ++ ", " ++
                         elevator_to_json(Elev) end,
-                    elevator_to_json(lists:nth(1, WorldState#worldState.elevators)),
-                    lists:nthtail(1, WorldState#worldState.elevators))
+                    elevator_to_json(lists:nth(1, Elevators)),
+                    lists:nthtail(1, Elevators))
     ++ "}}'",
 
     % io:fwrite(JsonState ++ "~n"),

@@ -24,7 +24,7 @@ start(_StartType, _StartArgs) ->
     % -define(COOKIE, "bananpose_999").
     % erlang:set_cookie(self(), ?COOKIE),
 
-    WorldState = make_worldState(?NUM_FLOORS),
+    WorldState = make_world_state(?NUM_FLOORS),
     
     % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
     discover:start(),
@@ -49,13 +49,13 @@ stop(_State) ->
 
 %%
 %% MOVE to worldstate.hrl .. will have to move includes beneath exports, but thats fine!
-make_worldState(NumFloors) ->
+make_world_state(NumFloors) ->
     
     HallRequests = lists:duplicate(NumFloors, {#hallRequest{}, #hallRequest{}}),
     
     LocalElevator = {node(), make_elevator(NumFloors)},
 
-    #worldState{hallRequests=HallRequests, elevators=[LocalElevator]}.
+    {[LocalElevator], HallRequests}.
     
 make_elevator(NumFloors) ->
 
