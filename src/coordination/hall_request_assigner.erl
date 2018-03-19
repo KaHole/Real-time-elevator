@@ -22,17 +22,13 @@ test() ->
 assign({Elevators, HallRequests}) ->
 
     % Filters on active nodes, only active nodes should be taken in account
-    ActiveNodes = nodes(),
-    ActiveElevators = lists:filter(fun(E) -> lists:member(E, ActiveNodes) end, Elevators),
+    ActiveNodes = nodes() ++ [node()],
+    ActiveElevators = lists:filter(fun({Id, _}) -> lists:member(Id, ActiveNodes) end, Elevators),
 
-    JsonState = "'{\"hallRequests\": [" ++
-    lists:foldr(fun(Hall, Acc) ->
-                        Acc ++ ", " ++
-                        hall_to_json(Hall) end,
-                    hall_to_json(lists:nth(1, HallRequests)), % First element in list
-                    lists:nthtail(1, HallRequests))
+    JsonState = "'{\"hallRequests\": " ++
+    json(lists:map(fun({HallUp, HallDown}) -> [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end, HallRequests))
 
-    ++ "], \"states\" : {" ++
+    ++ ", \"states\" : {" ++
     lists:foldr(fun(Elev, Acc) ->
                         Acc ++ ", " ++
                         elevator_to_json(Elev) end,
@@ -40,7 +36,7 @@ assign({Elevators, HallRequests}) ->
                     lists:nthtail(1, ActiveElevators))
     ++ "}}'",
 
-    % io:fwrite(JsonState ++ "~n"),
+    io:fwrite(JsonState ++ "~n"),
 
     Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
     maps:get(list_to_binary(atom_to_list(node())), Data).
@@ -48,20 +44,14 @@ assign({Elevators, HallRequests}) ->
 
 % JSONifiers
 
-bs(true) -> "true";
-bs(_) -> "false".
-
-hall_to_json({HallUp, HallDown}) ->
-    "[" ++ bs(HallUp#hallRequest.state =:= accepted) ++
-    "," ++ bs(HallDown#hallRequest.state =:= accepted) ++ "]".
-
 elevator_to_json({Id, Elev}) ->
     "\"" ++ atom_to_list(Id) ++ "\" : {" ++
     "\"behaviour\": \"" ++ atom_to_list(Elev#elevator.behaviour) ++
     "\", \"floor\": " ++ integer_to_list(Elev#elevator.floor) ++
     ", \"direction\": \"" ++ atom_to_list(Elev#elevator.direction) ++
-    "\", \"cabRequests\": [" ++
-    lists:foldr(fun(Cab, CAcc) -> CAcc ++ ", " ++ bs(Cab) end,
-                bs(lists:nth(1, Elev#elevator.cabRequests)),
-                lists:nthtail(1, Elev#elevator.cabRequests))
-    ++ "]}".
+    "\", \"cabRequests\": " ++ json(Elev#elevator.cabRequests) ++
+    "}".
+
+json(Data) ->
+    binary_to_list(jsone:encode(Data)).
+
