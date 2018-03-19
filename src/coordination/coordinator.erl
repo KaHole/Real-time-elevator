@@ -5,10 +5,6 @@
 start({Elevators, HallRequests}) ->
     register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
-% BIBELEN:
-% WHEN CALLING HALL_REQUEST_ASSIGNER, FILTER ON nodes() TO ONLY SEND THE ACTIVE ONES!!
-
-
 % observe() ->
 
 %     local_elevator_update->
@@ -27,15 +23,12 @@ start({Elevators, HallRequests}) ->
 % trenger kanskje ikke worldState record.. mer rot bare? hmm 50-50
 
 observe(Elevators, HallRequests) ->
-
     receive
         {local_elevator_update, Elevator, HallButtons} ->
 
             io:fwrite("local elevator ~n"),
-
             _Elevators = update_elevator(Elevators, node(), Elevator),
             _HallRequests = add_hall_requests(HallRequests, HallButtons),
-
             broadcast_state(Elevator, _HallRequests);
 
         {elevator_update, Id, Elevator, NewHallRequests} ->
@@ -44,24 +37,23 @@ observe(Elevators, HallRequests) ->
 
             _Elevators = update_elevator(Elevators, Id, Elevator),
 
-            %TODO: Maybe put more of this stuff in the consense module, makes it a lot tidier here as well.
+            % TODO: Maybe put more of this stuff in the consense module, makes it a lot tidier here as well.
             MergedHallRequests = update_hall_requests(HallRequests, NewHallRequests),
-
             _HallRequests = consensus:consense(MergedHallRequests),
 
-            %TODO: is this local elevator data redundant / stale.. does it matter?
+            % TODO: is this local elevator data redundant / stale.. does it matter?
             {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
             broadcast_state(LocalElevator, _HallRequests),
 
-            %TODO: prune/filter on active nodes! only active nodes should be taken in account
-            %TODO: Do this in hall_assigner instead?!!
-            ActiveElevators = lists:filter( , _Elevators),
+            % Filters on active nodes, only active nodes should be taken in account
+            % TODO: Do this in hall_assigner instead?!!
+            ActiveNodes = nodes(),
+            ActiveElevators = lists:filter(fun(E) -> lists:member(E, ActiveNodes) , _Elevators),
             AssignedHallCalls = hall_request_assigner:assign({ActiveElevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
             elevator_logic ! {hall_requests, AssignedHallCalls}
     end,
-
     observe(_Elevators, _HallRequests).
 
 
@@ -89,6 +81,7 @@ update_hall_requests([{HallUp, HallDown} | Tail], [{NewHallUp, NewHallDown} | Ne
     [{merge_hall_requests(HallUp, NewHallUp), merge_hall_requests(HallDown, NewHallDown)} | update_hall_requests(Tail, NewTail)];
 
 update_hall_requests([], []) -> [].
+
 
 merge_hall_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=nothing}) -> HallRequest1;
 
