@@ -79,7 +79,7 @@ get_floor_panel_state(Pid, Floor_list, Floor_number) ->
 elevator_algorithm(Pid, State) ->
     {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor, State#elevator.cabRequests),
 
-    Go_up = lists:any(fun(X) -> X end, [lists:nth(State#.elevator.floor)] ++ Cab_request_up),
+    Go_up = lists:any(fun(X) -> X end, [lists:nth(State#elevator.floor)] ++ Cab_request_up),
     Go_down = lists:any(fun(X) -> X end, Cab_request_down),
     Continue = case State#elevator.direction of
         up -> Go_up;
@@ -107,7 +107,7 @@ elevator_algorithm(Pid, State) ->
                     direction=stop,
                     cabRequests=lists:duplicate(length(State#elevator.cabRequests), false)
                 }
-        end,
+        end
     end.
     % New_state.
 
