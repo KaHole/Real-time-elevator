@@ -28,12 +28,16 @@ observe(Elevators, HallRequests) ->
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
-            elevator_logic ! {hall_calls, AssignedHallCalls}
+            elevator_logic ! {hall_calls, AssignedHallCalls};
 
-        % TODO: Treat this a seperate event? Design kinda makes it impossible to do anything else.
+        % TODO: FUCK THIS? JUST USE DONE ATOM in hall-calls from elevator logic?
+        %  Treat this a seperate event? Design kinda makes it impossible to do anything else.
         % {hall_request_done, Floor, Direction} ->
-            % mark hall-request as done and SEND IT OUT!!
-            % this will have the same stale elevator stale problem as above. doesnt really matter but, something to consider
+        %     % mark hall-request as done and SEND IT OUT!!
+        %     % this will have the same stale elevator stale problem as above. doesnt really matter but, something to consider
+        %     _HallRequests = mark_hall_request_done(Floor, Direction, HallRequests),
+        %     _Elevators = Elevators
+
     end,
     observe(_Elevators, _HallRequests).
 
@@ -51,6 +55,17 @@ add_hall_requests(HallRequests, HallCalls) ->
     % Merge with existing in the same way as foreign hallrequests, this is a clever way of doing it.
     consensus:merge_hall_request_lists(HallRequests, NewHallRequests).
 
+
+% TODO: FUCK THIS? same as above
+% % TODO: Pass på indekseringen!! 0,1 wtf
+% mark_hall_request_done(0, up, [{HallUp, HallDown}|Tail]) -> [{HallUp#hallRequest{status=done, observedBy=[node()]}, HallDown}|Tail];
+
+% mark_hall_request_done(0, down, [{HallUp, HallDown}|Tail]) -> [{HallUp, HallDown#hallRequest{status=done, observedBy=[node()]}}|Tail];
+
+% mark_hall_request_done(Floor, Direction, [Hall|Tail]) -> [Hall|mark_hall_request_done(Floor-1, Direction, Tail)]
+
+
+generate_hall_request(done) -> #hallRequest{state=done, observedBy=[node()]};
 generate_hall_request(true) -> #hallRequest{state=new, observedBy=[node()]};
 generate_hall_request(false) -> #hallRequest{}.
 
