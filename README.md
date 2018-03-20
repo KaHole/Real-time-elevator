@@ -7,13 +7,13 @@ Real-time elevator system for TTK4145
 Modules
 ----
 
-- [ ] Use ´-type´ syntax to define custom types, and learn how to actually use them. 
-- [ ] Coordinator (main)
-- [ ] Consensus state machine (50%)
+- [ ] Use ´-type´ syntax to define custom types, and learn how to actually use them. ??? Or whatever :P
 - [ ] Elevator logic
 
 - [ ] Heartbeats / fault-recovery / tolerance
 
+- [x] Coordinator (main)
+- [x] Consensus state machine
 - [x] Hall request assigner integration
 - [x] Networking
 - [x] Node discovery
