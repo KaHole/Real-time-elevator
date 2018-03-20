@@ -27,7 +27,7 @@ start(_StartType, _StartArgs) ->
     WorldState = make_world_state(?NUM_FLOORS),
     
 
-    % io:format("~p~n", [hall_request_assigner:test()]),
+    io:format("ARGS: ~p~n", [_StartArgs]),
 
     % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
     discover:start(),
