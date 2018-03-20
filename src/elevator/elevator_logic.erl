@@ -55,10 +55,12 @@ elevator_controller(Pid, State) ->
     
     % Figure out which direction to go
     New_state = elevator_algorithm(Pid, State#elevator{cabRequests=New_panel_state}),
-    elevator_interface:set_motor_direction(Pid, New_state#elevator.direction),
 
     % Check if arrive at a wanted floor
     New_new_state = check_arrival(Pid, New_state),
+
+    elevator_interface:set_motor_direction(Pid, New_state#elevator.direction),
+    elevator_interface:set_floor_indicator(Pid, New_state#elevator.floor),
 
     elevator_controller(Pid, New_state).
 
@@ -77,9 +79,13 @@ get_floor_panel_state(Pid, Floor_list, Floor_number) ->
     get_floor_panel_state(Pid, lists:append([Floor_state], Floor_list), Floor_number-1).
 
 elevator_algorithm(Pid, State) ->
-    {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor, State#elevator.cabRequests),
+    {Cab_request_down, Cab_request_up} = 
+        lists:split(State#elevator.floor, State#elevator.cabRequests),
 
-    Go_up = lists:any(fun(X) -> X end, [lists:nth(State#elevator.floor)] ++ Cab_request_up),
+    Go_up = lists:any(fun(X) -> X end, 
+        [lists:nth(State#elevator.floor, State#elevator.cabRequests)] ++ 
+        Cab_request_up
+    ),
     Go_down = lists:any(fun(X) -> X end, Cab_request_down),
     Continue = case State#elevator.direction of
         up -> Go_up;
@@ -111,9 +117,42 @@ elevator_algorithm(Pid, State) ->
     end.
     % New_state.
 
-check_arrival(Pid, New_state) ->
-    ok.
+check_arrival(Pid, State) ->
+    AtFloor = case elevator_interface:get_floor_sensor_state(Pid) of
+        between_floor -> State#elevator.floor;
+        _ -> elevator_interface:get_floor_sensor_state(Pid)
+    end.
 
+    StopAtFloor = lists:nth(
+        AtFloor,
+        State#elevator.cabRequests
+    )
+    % If we stop return new state, else return old
+    case StopAtFloor of
+        true -> stop_at_floor(Pid, State);
+        _ -> State
+    end.
+
+stop_at_floor(Pid, State) ->
+    elevator_interface:set_motor_direction(Pid, stop),
+    elevator_interface:set_order_button_light(Pid, cab, State#elevator.floor, off),
+    elevator_interface:set_door_open_light(Pid, on),
+    timer:sleep(2000),
+    case elevator_interface:get_obstruction_switch_state(Pid) of
+        1 -> stop_at_floor(Pid, State)
+    end,
+    elevator_interface:set_door_open_light(Pid, off), % Close within 5 seconds?
+    State#elevator{
+        cabRequests=setnth(
+            State#elevator.floor,
+            State#elevator.cabRequests,
+            false
+        )
+    }
+
+% https://stackoverflow.com/questions/4776033/how-to-change-an-element-in-a-list-in-erlang
+setnth(1, [_|Rest], New) -> [New|Rest];
+setnth(I, [E|Rest], New) -> [E|setnth(I-1, Rest, New)].
 
 % cab_server(Pid, State) ->
 %     receive
