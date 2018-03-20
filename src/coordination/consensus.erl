@@ -51,10 +51,11 @@ consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
     _ObservedBy = observe(ObservedBy, node()),
     Nodes = nodes(),
 
-    if
-        length(Nodes) + 1 == length(_ObservedBy) -> 
+
+    case length(Nodes) + 1 of
+        length(_ObservedBy) ->
             #hallRequest{state=advance(State), observedBy=[node()]};
-        true ->
+        _ -> 
             #hallRequest{state=State, observedBy=_ObservedBy}
     end.
 
