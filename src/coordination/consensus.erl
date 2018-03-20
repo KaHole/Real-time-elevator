@@ -65,5 +65,5 @@ observe(ObservedBy, Node) ->
 
 advance(new) -> accepted;
 % tror kanskje vi trenger denne allikavel:
-% advance(done) -> nothing;
+advance(done) -> nothing;
 advance(S) -> S.

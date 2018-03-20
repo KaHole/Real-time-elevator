@@ -29,6 +29,12 @@ observe(Elevators, HallRequests) ->
 
             % Send assigned hall-requests to elevator logic
             elevator_logic ! {hall_calls, AssignedHallCalls}
+
+        % TODO: Treat this a seperate event? Design kinda makes it impossible to do anything else.
+        % {hall_request_done, Floor, Direction} ->
+            %
+            % mark hall-request as done and SEND IT OUT!!
+            % this will have the same stale elevator stale problem as above. doesnt really matter but, something to consider
     end,
     observe(_Elevators, _HallRequests).
 
