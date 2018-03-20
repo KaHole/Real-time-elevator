@@ -26,7 +26,6 @@ start(_StartType, _StartArgs) ->
 
     WorldState = make_world_state(?NUM_FLOORS),
     
-
     io:format("ARGS: ~p~n", [_StartArgs]),
 
     % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
@@ -50,7 +49,7 @@ stop(_State) ->
 %%====================================================================
 
 %%
-%% MOVE to worldstate.hrl .. will have to move includes beneath exports, but thats fine!
+%% MOVE to worldstate.hrl ?? .. will have to move includes beneath exports, but thats fine!
 make_world_state(NumFloors) ->
     
     HallRequests = lists:duplicate(NumFloors, {#hallRequest{}, #hallRequest{}}),
@@ -63,5 +62,3 @@ make_elevator(NumFloors) ->
 
     CabRequests = lists:duplicate(NumFloors, false),
     #elevator{cabRequests=CabRequests}.
-    
-

@@ -1,8 +1,5 @@
-
 -module(hall_request_assigner).
-
 -include("../../include/worldstate.hrl").
-
 -export([assign/1, test/0]).
 
 %-----------------------------
@@ -35,8 +32,6 @@ assign({Elevators, HallRequests}) ->
                     lists:nthtail(1, ActiveElevators))
     ++ "}}'",
 
-    % io:fwrite(JsonState ++ "~n"),
-
     Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
     maps:get(list_to_binary(atom_to_list(node())), Data).
 
@@ -58,4 +53,3 @@ elevator_to_json({Id, Elevator}) ->
 
 json(Data) ->
     binary_to_list(jsone:encode(Data)).
-

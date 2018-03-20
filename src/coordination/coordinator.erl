@@ -7,11 +7,11 @@ start({Elevators, HallRequests}) ->
 
 observe(Elevators, HallRequests) ->
     receive
-        {local_elevator_update, Elevator, HallButtons} ->
+        {local_elevator_update, Elevator, HallCalls} ->
 
             io:fwrite("local elevator ~n"),
             _Elevators = update_elevator(Elevators, node(), Elevator),
-            _HallRequests = add_hall_requests(HallRequests, HallButtons),
+            _HallRequests = add_hall_requests(HallRequests, HallCalls),
             broadcast_state(Elevator, _HallRequests);
 
         {elevator_update, Id, Elevator, ExternalHallRequests} ->
@@ -28,7 +28,13 @@ observe(Elevators, HallRequests) ->
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
-            elevator_logic ! {hall_requests, AssignedHallCalls}
+            elevator_logic ! {hall_calls, AssignedHallCalls}
+
+        % TODO: Treat this a seperate event? Design kinda makes it impossible to do anything else.
+        % {hall_request_done, Floor, Direction} ->
+            %
+            % mark hall-request as done and SEND IT OUT!!
+            % this will have the same stale elevator stale problem as above. doesnt really matter but, something to consider
     end,
     observe(_Elevators, _HallRequests).
 
@@ -36,12 +42,12 @@ observe(Elevators, HallRequests) ->
 update_elevator(Elevators, Id, Elevator) ->
     lists:keystore(Id, 1, Elevators, {Id, Elevator}).
 
-add_hall_requests(HallRequests, HallButtons) ->
+add_hall_requests(HallRequests, HallCalls) ->
 
             %TODO: Warning! this might need to be square brackets, same behaviour, doesnt matter really, but watch out
     NewHallRequests = lists:map(fun({HallUp, HallDown}) ->
                                         {generate_hall_request(HallUp), generate_hall_request(HallDown)}
-                                end, HallButtons),
+                                end, HallCalls),
 
     % Merge with existing in the same way as foreign hallrequests, this is a clever way of doing it.
     consensus:merge_hall_request_lists(HallRequests, NewHallRequests).
