@@ -31,6 +31,8 @@ merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallReques
 
 merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
+merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequest2) -> HallRequest2;
+
 merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
 
     ObsBySet1 = sets:from_list(ObservedBy1),
@@ -64,6 +66,5 @@ observe(ObservedBy, Node) ->
     end.
 
 advance(new) -> accepted;
-% tror kanskje vi trenger denne allikavel:
 advance(done) -> nothing;
 advance(S) -> S.
