@@ -28,7 +28,7 @@ observe(Elevators, HallRequests) ->
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
-            elevator_logic ! {hall_calls, AssignedHallCalls};
+            elevator_logic ! {hall_calls, AssignedHallCalls}
 
         % TODO: FUCK THIS? JUST USE DONE ATOM in hall-calls from elevator logic?
         %  Treat this a seperate event? Design kinda makes it impossible to do anything else.

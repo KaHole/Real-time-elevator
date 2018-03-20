@@ -22,34 +22,26 @@ assign({Elevators, HallRequests}) ->
     ActiveNodes = nodes() ++ [node()],
     ActiveElevators = lists:filter(fun({Id, _}) -> lists:member(Id, ActiveNodes) end, Elevators),
 
-    JsonState = "'{\"hallRequests\": " ++
-    hall_requests_to_json(HallRequests) ++
-    ", \"states\" : {" ++
-    lists:foldr(fun(Elev, Acc) ->
+    ElevatorJson = lists:foldr(fun(Elev, Acc) ->
                         Acc ++ ", " ++
                         elevator_to_json(Elev) end,
                     elevator_to_json(lists:nth(1, ActiveElevators)),
-                    lists:nthtail(1, ActiveElevators))
-    ++ "}}'",
+                    lists:nthtail(1, ActiveElevators)),
+
+    JsonState = io_lib:format("'{\"hallRequests\": ~s, \"states\": {~s}}'", [hall_requests_to_json(HallRequests), ElevatorJson]),
 
     Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
     maps:get(list_to_binary(atom_to_list(node())), Data).
 
-
-% JSONifiers
 
 hall_requests_to_json(HallRequests) ->
     json(lists:map(fun({HallUp, HallDown}) ->
                            [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end,
                    HallRequests)).
 
-elevator_to_json({Id, Elevator}) ->
-    "\"" ++ atom_to_list(Id) ++ "\" : {" ++
-    "\"behaviour\": \"" ++ atom_to_list(Elevator#elevator.behaviour) ++
-    "\", \"floor\": " ++ integer_to_list(Elevator#elevator.floor) ++
-    ", \"direction\": \"" ++ atom_to_list(Elevator#elevator.direction) ++
-    "\", \"cabRequests\": " ++ json(Elevator#elevator.cabRequests) ++
-    "}".
+elevator_to_json({Id, #elevator{behaviour=Behaviour, floor=Floor, direction=Dir, cabRequests=CabRequests}}) ->
+    io_lib:format("\"~s\" : {\"behaviour\": \"~s\", \"floor\": ~p, \"direction\": \"~s\", \"cabRequests\": ~s}",
+                  [Id, Behaviour, Floor, Dir, json(CabRequests)]).
 
 json(Data) ->
     binary_to_list(jsone:encode(Data)).
