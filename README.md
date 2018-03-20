@@ -28,7 +28,7 @@ Build
 ----
     $ rebar3 compile
 
-Make binary
+Release
 ----
     $ rebar3 release
 
