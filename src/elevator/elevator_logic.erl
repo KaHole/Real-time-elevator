@@ -24,7 +24,7 @@ start() ->
         floor=elevator_interface:get_floor_sensor_state(Pid),
         direction=stop,
         cabRequests=lists:duplicate(4, false)
-    }
+    },
     register(elevator_controller, 
         spawn(fun() -> 
             elevator_controller(
