@@ -15,10 +15,15 @@ start() ->
     % register(cab_server, Cab_server_pid),
     % % io:fwrite("~p~n", [Cab_server_pid]),
 
-    % Button_poller_pid = spawn(fun() -> button_poller(
-    %         Pid,
-    %         lists:duplicate(4, false)) 
-    %     end).
+    register(elevator_state_poller,
+        spawn(fun() -> 
+        elevator_state_poller(
+            Pid,
+            []
+            % [lists:duplicate(4, false)]
+        ) 
+        end
+    ),
     Dummy_state = #elevator{
         behaviour=idle,
         floor=elevator_interface:get_floor_sensor_state(Pid),
@@ -48,7 +53,11 @@ init(Pid, _) ->
 
 elevator_controller(Pid, State) -> 
     % Checks for pressed cab floor panel buttons
-    Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
+    % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
+    floor_panel_poller ! {self(), updated_state},
+    receive
+        
+    end,
     
     % Union of previous panel state and new polled state
     New_panel_state = [A or B || {A,B} <- lists:zip(State#elevator.cabRequests, Polled_panel_state)],
@@ -64,11 +73,15 @@ elevator_controller(Pid, State) ->
 
     elevator_controller(Pid, New_state).
 
-% button_poller(Pid, Floors) ->
-%     time:sleep(100),
-%     New_floors_state = get_floor_state(Pid, Floors, length(Floors))
-%     cab_server ! {cab_call_list, New_floors_state},
-%     button_poller(Pid, Floors).
+elevator_state_poller(Pid, Floors) ->
+    New_floors_state = get_floor_state(Pid, Floors, length(Floors))
+    receive
+        {Sender, updated_state} -> 
+            ok; % Return new state
+    end,
+
+    
+    elevator_state_poller(Pid, Floors).
 
 get_floor_panel_state(Pid, Floor_list, 0) ->
     Floor_state = elevator_interface:get_order_button_state(Pid, 0, cab),
@@ -93,23 +106,31 @@ elevator_algorithm(Pid, State) ->
         stop -> false
     end,
 
+    AtFloor = case elevator_interface:get_floor_sensor_state(Pid) of
+        between_floor -> State#elevator.floor;
+        _ -> elevator_interface:get_floor_sensor_state(Pid)
+    end.
+
     case Continue of 
         false -> 
         % New_state = if 
         if
             Go_up ->
                 State#elevator{
+                    floor=AtFloor,
                     direction=up
                 }
             ;
             Go_down ->
                 State#elevator{
+                    floor=AtFloor,
                     direction=down
                 }
             ;
             true -> 
                 State#elevator{
                     behaviour=idle,
+                    floor=AtFloor,
                     direction=stop,
                     cabRequests=lists:duplicate(length(State#elevator.cabRequests), false)
                 }
@@ -137,7 +158,7 @@ stop_at_floor(Pid, State) ->
     elevator_interface:set_motor_direction(Pid, stop),
     elevator_interface:set_order_button_light(Pid, cab, State#elevator.floor, off),
     elevator_interface:set_door_open_light(Pid, on),
-    timer:sleep(2000),
+    timer:sleep(2000),  % Remain open for 2 sec. Alt. move to case beneath.
     case elevator_interface:get_obstruction_switch_state(Pid) of
         1 -> stop_at_floor(Pid, State)
     end,
