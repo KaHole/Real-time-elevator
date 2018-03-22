@@ -7,7 +7,7 @@ Real-time elevator system for TTK4145
 Modules
 ----
 
-- [ ] Use ´-type´ syntax to define custom types, and learn how to actually use them. ??? Or whatever :P
+- [ ] erl_tidy er heftig, optimaliserer kode, formaterer og gjøre syke endringer.
 - [ ] Elevator logic
 
 - [ ] Heartbeats / fault-recovery / tolerance
