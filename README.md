@@ -8,6 +8,7 @@ Modules
 ----
 
 - [ ] erl_tidy er heftig, optimaliserer kode, formaterer og gjøre syke endringer.
+- [ ] Style guide: https://github.com/inaka/erlang_guidelines
 - [ ] Elevator logic
 
 - [ ] Heartbeats / fault-recovery / tolerance
