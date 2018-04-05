@@ -56,7 +56,7 @@ elevator_state_poller(Pid, State) ->
 
     % Get floor number. Ignores between_floor
     AtFloor = case elevator_interface:get_floor_sensor_state(Pid) of
-        between_floor -> State#elevator.floor;
+        between_floors -> State#elevator.floor;
         _ -> elevator_interface:get_floor_sensor_state(Pid)
     end,
 
@@ -102,12 +102,11 @@ elevator_controller(Pid) ->
     end,
     elevator_controller(Pid).
 
-
 elevator_algorithm(State) ->
-    {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor, State#elevator.cabRequests),
+    {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, State#elevator.cabRequests),
 
     Go_up = lists:any(fun(X) -> X end, 
-        [lists:nth(State#elevator.floor, State#elevator.cabRequests)] ++ Cab_request_up
+        [lists:nth(State#elevator.floor+1, State#elevator.cabRequests)] ++ Cab_request_up
     ),
     Go_down = lists:any(fun(X) -> X end, Cab_request_down),
     Continue = case State#elevator.direction of
@@ -141,7 +140,7 @@ elevator_algorithm(State) ->
 
 check_arrival(Pid, State) ->
     StopAtFloor = lists:nth(
-        State#elevator.floor,
+        State#elevator.floor+1,
         State#elevator.cabRequests
     ),
 
@@ -163,7 +162,7 @@ stop_at_floor(Pid, State) ->
     elevator_interface:set_door_open_light(Pid, off), % Close within 5 seconds?
     State#elevator{
         cabRequests=setnth(
-            State#elevator.floor,
+            State#elevator.floor+1,
             State#elevator.cabRequests,
             false
         )
