@@ -12,7 +12,7 @@
 }).
 
 % Obsolete?
-% we should still enforce atom()|elevator tuple somehow? shit
+% we should still enforce atom()|elevator tuple somehow? or not?
 % -record(worldState, {
 %     hallRequests = [] ::[{#hallRequest{}, #hallRequest{}}], % list of tuples of up/down hall-request pairs
 %     elevators = [] ::[atom()|#elevator{}] % tuple of node-id and elevator object

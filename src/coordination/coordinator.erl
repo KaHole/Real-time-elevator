@@ -11,7 +11,7 @@ observe(Elevators, HallRequests) ->
 
             io:fwrite("local elevator ~n"),
             _Elevators = update_elevator(Elevators, node(), Elevator),
-            _HallRequests = add_hall_requests(HallRequests, HallCalls),
+            _HallRequests = update_hall_requests(HallRequests, HallCalls),
             broadcast_state(Elevator, _HallRequests);
 
         {elevator_update, Id, Elevator, ExternalHallRequests} ->
@@ -30,6 +30,10 @@ observe(Elevators, HallRequests) ->
             % Send assigned hall-requests to elevator logic
             elevator_logic ! {hall_calls, AssignedHallCalls}
 
+        % TODO: Only fetch nodes() once per run, this is important for it to be determenistic! and purely functional,
+            % and to not get strange side-effects where the node-list changes in between shit.
+
+
         % TODO: FUCK THIS? JUST USE DONE ATOM in hall-calls from elevator logic?
         %  Treat this a seperate event? Design kinda makes it impossible to do anything else.
         % {hall_request_done, Floor, Direction} ->
@@ -42,10 +46,13 @@ observe(Elevators, HallRequests) ->
     observe(_Elevators, _HallRequests).
 
 
+% General TODO: Pass på HallRequest vs HallCalls over alt! Samme med CabCalls (CabRequests skal ikke egentlig finnes)
+
+
 update_elevator(Elevators, Id, Elevator) ->
     lists:keystore(Id, 1, Elevators, {Id, Elevator}).
 
-add_hall_requests(HallRequests, HallCalls) ->
+update_hall_requests(HallRequests, HallCalls) ->
 
             %TODO: Warning! this might need to be square brackets, same behaviour, doesnt matter really, but watch out
     NewHallRequests = lists:map(fun({HallUp, HallDown}) ->
