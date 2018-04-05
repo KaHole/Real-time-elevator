@@ -1,10 +1,10 @@
 -module(elevator_logic).
 -include("../../include/worldstate.hrl").
 
--export([start/0]).
+-export([start/1]).
 
-start() ->
-    {_, Pid} = elevator_interface:start(),
+start(Pid) ->
+    % {_, Pid} = elevator_interface:start(),
     io:fwrite("~p~n", [Pid]),
     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
 
