@@ -7,13 +7,6 @@ start() ->
     {_, Pid} = elevator_interface:start(),
     io:fwrite("~p~n", [Pid]),
     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
-    
-    % Cab_server_pid = spawn(fun() -> cab_server(
-    %         Pid, 
-    %         #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}) 
-    %     end),
-    % register(cab_server, Cab_server_pid),
-    % % io:fwrite("~p~n", [Cab_server_pid]),
 
     Dummy_state = #elevator{
         behaviour=idle,
@@ -171,55 +164,3 @@ stop_at_floor(Pid, State) ->
 % https://stackoverflow.com/questions/4776033/how-to-change-an-element-in-a-list-in-erlang
 setnth(1, [_|Rest], New) -> [New|Rest];
 setnth(I, [E|Rest], New) -> [E|setnth(I-1, Rest, New)].
-
-
-% % cab_server(Pid, State) ->
-% %     receive
-% %         {cab_call, Floor} -> cab_server(Pid, cab_call(Pid, State, Floor));
-% %         {cab_call_list, Floors} ->
-% %         % {hall_call, List} -> ;
-% %         _ -> io:format("njet~n"),
-% %                 cab_server(Pid, State)
-% %     end.
-
-% cab_call(Pid, State, Floor) ->
-%     elevator_interface:set_door_open_light(Pid, off),
-%     elevator_interface:set_order_button_light(Pid, cab, Floor, on),
-%     elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
-    
-%     ToFloor = State#elevator.floor - Floor,
-%     Direction = if 
-%         ToFloor > 0 -> down;
-%         ToFloor < 0 -> up;
-%         true -> stop
-%     end,
-%     move(Pid, 
-%         State#elevator{behaviour=idle, direction=Direction},
-%         Floor).
-
-% move(Pid, #elevator{direction=stop} = State, NewFloor) ->
-%     elevator_interface:set_motor_direction(Pid, State#elevator.direction),
-%     elevator_interface:set_door_open_light(Pid, on),
-%     elevator_interface:set_order_button_light(Pid, cab, State#elevator.floor, off),
-%     elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
-%     State;
-
-% move(Pid, #elevator{behaviour=moving} = State, NewFloor) ->
-%     Floor = elevator_interface:get_floor_sensor_state(Pid),
-%     timer:sleep(100),
-%     elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
-%     if 
-%         Floor == NewFloor -> move(Pid, 
-%                 State#elevator{behaviour=idle, direction=stop, floor=Floor}, NewFloor);
-%         Floor /= between_floors -> move(Pid, State#elevator{floor=Floor}, NewFloor);
-%         true -> move(Pid, State, NewFloor)
-%     end;
-
-% move(Pid, State, NewFloor) ->
-%     elevator_interface:set_motor_direction(Pid, State#elevator.direction),
-%     timer:sleep(500),
-%     move(Pid, State#elevator{behaviour=moving}, NewFloor).
-    
-
-
-    
