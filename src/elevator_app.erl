@@ -29,11 +29,11 @@ start(_StartType, _StartArgs) ->
     io:format("ARGS: ~p~n", [_StartArgs]),
 
 
-    hall_request_assigner:test(),
+    %hall_request_assigner:test(),
 
-    % % elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
-    % discover:start(),
-    % coordinator:start(WorldState),
+    %elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
+    %discover:start(),
+    %coordinator:start(WorldState),
 
     % Ne = make_elevator(?NUM_FLOORS),
     % Ue = Ne#elevator{floor=3, direction=up, behaviour=moving},
