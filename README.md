@@ -35,7 +35,7 @@ Release
 
 ----
 
-![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/blob/master/doc/elevator_project.png)
+![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/raw/master/doc/Sanntid_moduler.png)
 
 ----
 
