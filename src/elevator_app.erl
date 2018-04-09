@@ -35,7 +35,7 @@ start(_StartType, _StartArgs) ->
 
     {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
-    %elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
+    elevator_logic:start(DriverPid),
     discover:start(),
     coordinator:start(WorldState),
 
