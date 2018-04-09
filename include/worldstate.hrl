@@ -1,7 +1,7 @@
 
 -record(elevator, {
     behaviour = idle ::atom(), % idle, moving, doorOpen
-    floor :: non_neg_integer(),
+    floor = 0 ::non_neg_integer(),
     direction = stop ::atom(), % stop, up, down
     cabRequests = [] ::[boolean()] 
 }).
