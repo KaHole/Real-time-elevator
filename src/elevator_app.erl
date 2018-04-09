@@ -14,7 +14,12 @@ start(_StartType, _StartArgs) ->
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
 
+
+    % Release skal helst starte alt (inkludert hardware-driveren) med en binary om mulig, uten config
+
+    %TODO: Fjerne dette før release?
     {_, Port} = application:get_env(port),
+
     {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
     discover:start(),
