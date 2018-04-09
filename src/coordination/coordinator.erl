@@ -49,9 +49,7 @@ observe(Elevators, HallRequests) ->
     end,
     observe(_Elevators, _HallRequests).
 
-
 % General TODO: Pass på HallRequest vs HallCalls over alt! Samme med CabCalls (CabRequests skal ikke egentlig finnes)
-
 
 update_elevator(Elevators, Id, Elevator) ->
     lists:keystore(Id, 1, Elevators, {Id, Elevator}).
@@ -65,15 +63,11 @@ update_hall_requests(HallRequests, HallCalls) ->
     % Merge with existing in the same way as foreign hallrequests, this is a clever way of doing it.
     consensus:merge_hall_request_lists(HallRequests, NewHallRequests).
 
-
 % TODO: FUCK THIS? same as above
 % % TODO: Pass på indekseringen!! 0,1 wtf
 % mark_hall_request_done(0, up, [{HallUp, HallDown}|Tail]) -> [{HallUp#hallRequest{status=done, observedBy=[node()]}, HallDown}|Tail];
-
 % mark_hall_request_done(0, down, [{HallUp, HallDown}|Tail]) -> [{HallUp, HallDown#hallRequest{status=done, observedBy=[node()]}}|Tail];
-
 % mark_hall_request_done(Floor, Direction, [Hall|Tail]) -> [Hall|mark_hall_request_done(Floor-1, Direction, Tail)]
-
 
 generate_hall_request(done) -> #hallRequest{state=done, observedBy=[node()]};
 generate_hall_request(true) -> #hallRequest{state=new, observedBy=[node()]};

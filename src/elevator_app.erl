@@ -1,23 +1,10 @@
-%%%-------------------------------------------------------------------
-%% @doc elevator public API
-%% @end
-%%%-------------------------------------------------------------------
-
 -module(elevator_app).
-
 -behaviour(application).
 
 -include("../include/worldstate.hrl").
-
-%% Constants
--define(NUM_FLOORS, 4).
-
-%% Application callbacks
 -export([start/2, stop/1]).
 
-%%====================================================================
-%% API
-%%====================================================================
+-define(NUM_FLOORS, 4).
 
 start(_StartType, _StartArgs) ->
 
@@ -26,33 +13,20 @@ start(_StartType, _StartArgs) ->
 
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
-    
-    io:format("ARGS: ~p~n", [_StartArgs]),
 
     {_, Port} = application:get_env(port),
-
-    io:format("PORT: ~p~n", [Port]),
-
     {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
     discover:start(),
     coordinator:start(WorldState),
-
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
-    
     elevator_logic:start(DriverPid),
 
     elevator_sup:start_link().
 
-%%--------------------------------------------------------------------
 stop(_State) ->
     ok.
 
-%%====================================================================
-%% Internal functions
-%%====================================================================
-
-%%
 %% MOVE to worldstate.hrl ?? .. will have to move includes beneath exports, but thats fine!
 make_world_state(Elevator) ->
     HallRequests = lists:duplicate(?NUM_FLOORS, {#hallRequest{}, #hallRequest{}}),
@@ -63,5 +37,4 @@ make_elevator() ->
     CabRequests = lists:duplicate(?NUM_FLOORS, false),
     #elevator{cabRequests=CabRequests}.
 
-make_hall_calls() ->
-    lists:duplicate(?NUM_FLOORS, [false, false]).
+make_hall_calls() -> lists:duplicate(?NUM_FLOORS, [false, false]).

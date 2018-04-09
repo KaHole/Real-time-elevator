@@ -4,34 +4,12 @@
 -export([start/1]).
 
 start(Pid) ->
-    % {_, Pid} = elevator_interface:start(),
     io:fwrite("~p~n", [Pid]),
     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
 
-    Dummy_state = #elevator{
-        behaviour=idle,
-        floor=elevator_interface:get_floor_sensor_state(Pid),
-        direction=stop,
-        cabRequests=lists:duplicate(4, false)
-    },
-    % register(elevator_state_poller,
-    %     spawn(fun() -> 
-    %         elevator_state_poller(
-    %             Pid,
-    %             Dummy_state
-    %         ) 
-    %         end
-    %     )
-    % ),
     register(elevator_controller, 
-        spawn(fun() -> 
-            elevator_controller(
-                Pid
-            )
-            end
-        )
+        spawn(fun() -> elevator_controller(Pid) end)
     ).
-
 
 init(Pid, #elevator{floor=between_floors}) ->
     elevator_interface:set_motor_direction(Pid, up),
@@ -40,42 +18,7 @@ init(Pid, #elevator{floor=between_floors}) ->
     init(Pid, #elevator{floor=Floor});
 
 init(Pid, _) -> 
-    elevator_interface:set_motor_direction(Pid, stop),
-    ok.
-
-elevator_state_poller(Pid, State) ->
-    % Polles new state and merges with existing
-    Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)-1),
-
-    % Get floor number. Ignores between_floor
-    AtFloor = case elevator_interface:get_floor_sensor_state(Pid) of
-        between_floors -> State#elevator.floor;
-        _ -> elevator_interface:get_floor_sensor_state(Pid)
-    end,
-
-    _State = State#elevator{
-        floor=AtFloor,
-        cabRequests=[A or B || {A,B} <- lists:zip(State#elevator.cabRequests, Polled_panel_state)]
-    },
-
-    receive
-        {Sender, get_state} -> 
-            Sender ! {updated_state, _State};
-        {_, NewState} ->
-            elevator_state_poller(Pid, NewState#elevator{
-                floor=AtFloor,
-                cabRequests=[A or B || {A,B} <- lists:zip(NewState#elevator.cabRequests, Polled_panel_state)]
-            })
-    end,
-    elevator_state_poller(Pid, _State).
-
-get_floor_panel_state(Pid, Floor_list, 0) ->
-    Floor_state = elevator_interface:get_order_button_state(Pid, 0, cab),
-    [A == 1 || A <- lists:append([Floor_state], Floor_list)];
-
-get_floor_panel_state(Pid, Floor_list, Floor_number) -> 
-    Floor_state = elevator_interface:get_order_button_state(Pid, Floor_number, cab),
-    get_floor_panel_state(Pid, lists:append([Floor_state], Floor_list), Floor_number-1).
+    elevator_interface:set_motor_direction(Pid, stop).
 
 elevator_controller(Pid) -> 
     % Checks for pressed cab floor panel buttons
