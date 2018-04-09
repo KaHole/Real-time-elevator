@@ -7,12 +7,12 @@ Real-time elevator system for TTK4145
 Modules
 ----
 
-- [ ] erl_tidy er heftig, optimaliserer kode, formaterer og gjøre syke endringer.
-- [ ] Style guide: https://github.com/inaka/erlang_guidelines
-- [ ] Elevator logic
-
 - [ ] Heartbeats / fault-recovery / tolerance
 
+- [ ] `erl_tidy` kan brukes for formattering og optimalisering
+- [ ] Style guide: https://github.com/inaka/erlang_guidelines
+
+- [x] Elevator logic
 - [x] Coordinator (main)
 - [x] Consensus state machine
 - [x] Hall request assigner integration
