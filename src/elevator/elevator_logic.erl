@@ -80,21 +80,21 @@ get_floor_panel_state(Pid, Floor_list, Floor_number) ->
 elevator_controller(Pid) -> 
     % Checks for pressed cab floor panel buttons
     % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
-    state_poller ! {self(), get_state},
+    timer:sleep(250),
+    state_poller ! {get_state, self()},
     receive
         {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
-            CabHallCall = [ Cab or Up or Down || {Cab,{Up,Down}} <- lists:zip(State#elevator.cabRequests, HallCalls)],
-            
+            CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabRequests, HallCalls)],
             % Figure out which direction to go
             _State = elevator_algorithm(State, CabHallCall),
 
             % Check if arrive at a wanted floor
-            Checked_arrival_state = check_arrival(Pid, _State, CabHallCall, HallCalls),
+            {NewState, _HallCalls} = check_arrival(Pid, _State, CabHallCall, HallCalls),
 
-            elevator_interface:set_motor_direction(Pid, Checked_arrival_state#elevator.direction),
-            elevator_interface:set_floor_indicator(Pid, Checked_arrival_state#elevator.floor),
-            state_poller ! {driven_state_update, Checked_arrival_state}
+            elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
+            elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor),
+            state_poller ! {driven_state_update, {NewState, _HallCalls}}
     end,
     elevator_controller(Pid).
 
@@ -155,7 +155,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
     % If we stop return new state, else return old
     case StopAtFloor of
         true -> stop_at_floor(Pid, State, HallCalls);
-        _ -> State
+        _ -> {State, HallCalls}
     end.
 
 stop_at_floor(Pid, State, HallCalls) ->
@@ -176,7 +176,7 @@ stop_at_floor(Pid, State, HallCalls) ->
             done
         )
     },
-    {Up, Down} = lists:nth(
+    [Up, Down] = lists:nth(
         State#elevator.floor+1,
         HallCalls
     ),
@@ -184,12 +184,12 @@ stop_at_floor(Pid, State, HallCalls) ->
         Up and State#elevator.direction == up -> setnth(
             State#elevator.floor+1,
             HallCalls,
-            {done, Down}
+            [done, Down]
         );
         Down and State#elevator.direction == down -> setnth(
             State#elevator.floor+1,
             HallCalls,
-            {Up, done}
+            [Up, done]
         );
         true -> HallCalls
     end,

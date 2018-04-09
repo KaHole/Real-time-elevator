@@ -35,11 +35,12 @@ start(_StartType, _StartArgs) ->
 
     {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
-    elevator_logic:start(DriverPid),
     discover:start(),
     coordinator:start(WorldState),
 
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
+    
+    elevator_logic:start(DriverPid),
 
     elevator_sup:start_link().
 

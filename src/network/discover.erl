@@ -1,7 +1,7 @@
 -module(discover).
 -export([start/0]).
 
--define(DISCOVER_PORT, 8889).
+-define(DISCOVER_PORT, 8888).
 
 start() ->
     {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {reuseaddr, true}, {broadcast, true}]),
