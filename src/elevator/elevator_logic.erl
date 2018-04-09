@@ -82,7 +82,7 @@ elevator_controller(Pid) ->
     % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
     elevator_state_poller ! {self(), get_state},
     receive
-        {updated_state, {State, HallCalls} -> 
+        {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
             CabHallCall = [ Cab or Up or Down || {Cab,{Up,Down}} <- lists:zip(State#elevator.cabRequests, HallCalls)]
             
@@ -180,7 +180,7 @@ stop_at_floor(Pid, State, HallCalls) ->
         State#elevator.floor+1,
         HallCalls
     ),
-    _HallCalls if 
+    _HallCalls = if 
         Up and State#elevator.direction == up -> setnth(
             State#elevator.floor+1,
             HallCalls,
