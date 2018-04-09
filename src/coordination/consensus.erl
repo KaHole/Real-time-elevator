@@ -6,9 +6,7 @@
 test() ->
     consense([{#hallRequest{state=nothing}, #hallRequest{state=nothing}}], [{#hallRequest{state=new, observedBy=[node()]}, #hallRequest{state=nothing}}]).
 
-%%====================================================================
-%% API ... skal vi ha dette overalt??
-%%====================================================================
+%--------------
 
 consense(HallRequests, ExternalHallRequests) ->
 
@@ -17,10 +15,6 @@ consense(HallRequests, ExternalHallRequests) ->
 
 merge_hall_request_lists(HallRequests, ExternalHallRequests) ->
     lists:map(fun({Floor1, Floor2}) -> merge_floors(Floor1, Floor2) end, lists:zip(HallRequests, ExternalHallRequests)).
-
-%%====================================================================
-%% Internal functions
-%%====================================================================
 
 merge_floors({HallUp1, HallDown1}, {HallUp2, HallDown2}) ->
     {merge_requests(HallUp1, HallUp2), merge_requests(HallDown1, HallDown2)}.

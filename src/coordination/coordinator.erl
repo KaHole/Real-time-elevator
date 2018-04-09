@@ -17,14 +17,12 @@ observe(Elevators, HallRequests) ->
         {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
             io:fwrite("foreign elevator ~n"),
-
             _Elevators = update_elevator(Elevators, Id, Elevator),
             _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
             % TODO: Check for changes? otherwise we get SPAM!
             if
                 _HallRequests =/= HallRequests ->
-
                     % TODO: is this local elevator data redundant / stale.. does it matter?
                     {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
                     broadcast_state(LocalElevator, _HallRequests);

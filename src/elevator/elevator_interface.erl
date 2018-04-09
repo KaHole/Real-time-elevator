@@ -54,7 +54,6 @@ get_stop_button_state(Pid) ->
 get_obstruction_switch_state(Pid) ->
     gen_server:call(Pid, get_obstruction_switch_state). 
 
-    
 
 %% Callback implementation
 
@@ -142,8 +141,3 @@ handle_call(get_obstruction_switch_state, _From, Socket) ->
 			   {ok, [9, 1, 0, 0]} -> active
 			end,
     {reply, ObstructionState, Socket}.
-    
-    
-			   
-    
-    
