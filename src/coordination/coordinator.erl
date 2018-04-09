@@ -21,9 +21,15 @@ observe(Elevators, HallRequests) ->
             _Elevators = update_elevator(Elevators, Id, Elevator),
             _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
-            % TODO: is this local elevator data redundant / stale.. does it matter?
-            {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-            broadcast_state(LocalElevator, _HallRequests),
+            % TODO: Check for changes? otherwise we get SPAM!
+            if
+                _HallRequests =/= HallRequests ->
+
+                    % TODO: is this local elevator data redundant / stale.. does it matter?
+                    {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
+                    broadcast_state(LocalElevator, _HallRequests);
+                true -> ok
+            end,
 
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
