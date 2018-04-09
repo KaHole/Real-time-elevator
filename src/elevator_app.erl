@@ -24,22 +24,18 @@ start(_StartType, _StartArgs) ->
     % -define(COOKIE, "bananpose_999").
     % erlang:set_cookie(self(), ?COOKIE),
 
-    WorldState = make_world_state(?NUM_FLOORS),
+    Elevator = make_elevator(),
+    WorldState = make_world_state(Elevator),
     
     io:format("ARGS: ~p~n", [_StartArgs]),
 
-
-    %hall_request_assigner:test(),
+    {_, DriverPid} = elevator_interface:start(),
 
     %elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
-    %discover:start(),
-    %coordinator:start(WorldState),
+    discover:start(),
+    coordinator:start(WorldState),
 
-    % Ne = make_elevator(?NUM_FLOORS),
-    % Ue = Ne#elevator{floor=3, direction=up, behaviour=moving},
-    % coordinator ! {local_elevator_update, Ue, [{true, false}, {false, false}, {false, false}, {false, false} ]},
-    % % coordinator ! {local_elevator_update, Ue, []},
-    % % coordinator ! {local_elevator_update, Ue, []},
+    state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
 
     elevator_sup:start_link().
 
@@ -53,15 +49,14 @@ stop(_State) ->
 
 %%
 %% MOVE to worldstate.hrl ?? .. will have to move includes beneath exports, but thats fine!
-make_world_state(NumFloors) ->
-    
-    HallRequests = lists:duplicate(NumFloors, {#hallRequest{}, #hallRequest{}}),
-    
-    LocalElevator = {node(), make_elevator(NumFloors)},
-
+make_world_state(Elevator) ->
+    HallRequests = lists:duplicate(?NUM_FLOORS, {#hallRequest{}, #hallRequest{}}),
+    LocalElevator = {node(), Elevator},
     {[LocalElevator], HallRequests}.
     
-make_elevator(NumFloors) ->
-
-    CabRequests = lists:duplicate(NumFloors, false),
+make_elevator() ->
+    CabRequests = lists:duplicate(?NUM_FLOORS, false),
     #elevator{cabRequests=CabRequests}.
+
+make_hall_calls() ->
+    lists:duplicate(?NUM_FLOORS, [false, false]).

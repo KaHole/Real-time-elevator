@@ -28,7 +28,7 @@ observe(Elevators, HallRequests) ->
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
-            elevator_logic ! {hall_calls, AssignedHallCalls}
+            state_poller ! {set_hall_calls, AssignedHallCalls}
 
         % TODO: Only fetch nodes() once per run, this is important for it to be determenistic! and purely functional,
             % and to not get strange side-effects where the node-list changes in between shit.
@@ -54,8 +54,7 @@ update_elevator(Elevators, Id, Elevator) ->
 
 update_hall_requests(HallRequests, HallCalls) ->
 
-            %TODO: Warning! this might need to be square brackets, same behaviour, doesnt matter really, but watch out
-    NewHallRequests = lists:map(fun({HallUp, HallDown}) ->
+    NewHallRequests = lists:map(fun([HallUp, HallDown]) ->
                                         {generate_hall_request(HallUp), generate_hall_request(HallDown)}
                                 end, HallCalls),
 
