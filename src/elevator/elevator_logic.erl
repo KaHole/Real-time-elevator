@@ -14,15 +14,15 @@ start(Pid) ->
         direction=stop,
         cabRequests=lists:duplicate(4, false)
     },
-    register(elevator_state_poller,
-        spawn(fun() -> 
-            elevator_state_poller(
-                Pid,
-                Dummy_state
-            ) 
-            end
-        )
-    ),
+    % register(elevator_state_poller,
+    %     spawn(fun() -> 
+    %         elevator_state_poller(
+    %             Pid,
+    %             Dummy_state
+    %         ) 
+    %         end
+    %     )
+    % ),
     register(elevator_controller, 
         spawn(fun() -> 
             elevator_controller(
@@ -80,7 +80,7 @@ get_floor_panel_state(Pid, Floor_list, Floor_number) ->
 elevator_controller(Pid) -> 
     % Checks for pressed cab floor panel buttons
     % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
-    elevator_state_poller ! {self(), get_state},
+    state_poller ! {self(), get_state},
     receive
         {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
@@ -94,7 +94,7 @@ elevator_controller(Pid) ->
 
             elevator_interface:set_motor_direction(Pid, Checked_arrival_state#elevator.direction),
             elevator_interface:set_floor_indicator(Pid, Checked_arrival_state#elevator.floor),
-            elevator_state_poller ! {self(), Checked_arrival_state}
+            state_poller ! {driven_state_update, Checked_arrival_state}
     end,
     elevator_controller(Pid).
 

@@ -58,7 +58,7 @@ state_server(Elevator, HallCalls) ->
             % JA, det går fint, dette er motsatt retning i pipe-linen uansett
             state_server(Elevator, _HallCalls);
 
-        {get_state, Sender} -> Sender ! {Elevator, HallCalls}
+        {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
     end,
 
     state_server(Elevator, HallCalls).
