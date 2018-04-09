@@ -7,6 +7,7 @@ Real-time elevator system for TTK4145
 Modules
 ----
 
+- [ ] Gå over kriterier for evaluering og spec for å få god karakter
 - [ ] Heartbeats / fault-recovery / tolerance
 
 - [ ] `erl_tidy` kan brukes for formattering og optimalisering
