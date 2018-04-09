@@ -29,7 +29,11 @@ start(_StartType, _StartArgs) ->
     
     io:format("ARGS: ~p~n", [_StartArgs]),
 
-    {_, DriverPid} = elevator_interface:start(),
+    {_, Port} = application:get_env(port),
+
+    io:format("PORT: ~p~n", [Port]),
+
+    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
     %elevator_logic:start( make_elevator(?NUM_FLOORS), WorldState#worldState.hallRequests),
     discover:start(),
