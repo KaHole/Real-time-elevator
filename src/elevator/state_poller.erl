@@ -17,13 +17,19 @@ state_server(Elevator, HallCalls) ->
         {polled_state_update, {#elevator{floor=Floor, cabRequests=CabRequests}, IncomingHallCalls}} ->
 
             _CabRequests = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabRequests, CabRequests)],
-            _Elevator = Elevator#elevator{floor=Floor, cabRequests=_CabRequests},
+
+            _Floor = case Floor of
+                between_floors -> Elevator#elevator.floor;
+                _ -> Floor
+            end,
+
+            _Elevator = Elevator#elevator{floor=_Floor, cabRequests=_CabRequests},
 
             % Detect changes, send to coordinator if anything to report
             HasIncomingHallCalls = lists:any(fun(E) -> E end, lists:flatten(IncomingHallCalls)),
             if
                 (Elevator#elevator.cabRequests =/= _CabRequests)
-                or (Elevator#elevator.floor =/= Floor)
+                or (Elevator#elevator.floor =/= _Floor)
                 or HasIncomingHallCalls ->
                     coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls},
                     io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
