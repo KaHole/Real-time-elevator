@@ -5,7 +5,7 @@
 %-----------------------------
 % Tester hall_request_assigner for debugging bare
 test() ->
-    Elevator = {node(), #elevator{cabRequests=[false, false, false, false], floor=1}},
+    Elevator = {node(), #elevator{cabCalls=[false, false, false, false], floor=1}},
     HallRequests = [{#hallRequest{state=accepted}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}},
@@ -39,8 +39,8 @@ hall_requests_to_json(HallRequests) ->
                            [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end,
                    HallRequests)).
 
-elevator_to_json({Id, #elevator{behaviour=Behaviour, floor=Floor, direction=Dir, cabRequests=CabRequests}}) ->
-    io_lib:format("\"~s\" : {\"behaviour\": \"~s\", \"floor\": ~p, \"direction\": \"~s\", \"cabRequests\": ~s}",
+elevator_to_json({Id, #elevator{behaviour=Behaviour, floor=Floor, direction=Dir, cabCalls=CabRequests}}) ->
+    io_lib:format("\"~s\" : {\"behaviour\": \"~s\", \"floor\": ~p, \"direction\": \"~s\", \"cabCalls\": ~s}",
                   [Id, Behaviour, Floor, Dir, json(CabRequests)]).
 
 json(Data) ->

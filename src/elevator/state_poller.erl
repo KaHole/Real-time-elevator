@@ -12,21 +12,21 @@ start(DriverPid, {Elevator, HallCalls}) ->
 state_server(Elevator, HallCalls) ->
     
     receive
-        {polled_state_update, {#elevator{floor=Floor, cabRequests=CabRequests}, IncomingHallCalls}} ->
+        {polled_state_update, {#elevator{floor=Floor, cabCalls=CabCalls}, IncomingHallCalls}} ->
 
-            _CabRequests = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabRequests, CabRequests)],
+            _CabCalls = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
 
             _Floor = case Floor of
                 between_floors -> Elevator#elevator.floor;
                 _ -> Floor
             end,
 
-            _Elevator = Elevator#elevator{floor=_Floor, cabRequests=_CabRequests},
+            _Elevator = Elevator#elevator{floor=_Floor, cabCalls=_CabCalls},
 
             % Detect changes, send to coordinator if anything to report
             HasIncomingHallCalls = lists:any(fun(E) -> E end, lists:flatten(IncomingHallCalls)),
             if
-                (Elevator#elevator.cabRequests =/= _CabRequests)
+                (Elevator#elevator.cabCalls =/= _CabCalls)
                 or (Elevator#elevator.floor =/= _Floor)
                 or HasIncomingHallCalls ->
                     coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls},
@@ -38,16 +38,16 @@ state_server(Elevator, HallCalls) ->
 
             state_server(_Elevator, HallCalls);
 
-        {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabRequests=CabRequests}, ActedHallCalls}} ->
+        {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabCalls=CabCalls}, ActedHallCalls}} ->
 
             % Detect done cab-calls
-            _CabRequests = [if B == done -> false; true -> A end || {A,B} <- lists:zip(Elevator#elevator.cabRequests, CabRequests)],
+            _CabCalls = [if B == done -> false; true -> A end || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
 
-            _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabRequests=_CabRequests},
+            _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
             HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
             if
-                (Elevator#elevator.cabRequests =/= _CabRequests)
+                (Elevator#elevator.cabCalls =/= _CabCalls)
                 or (Elevator#elevator.behaviour =/= Behaviour)
                 or (Elevator#elevator.direction =/= Direction)
                 or HasDoneHallCalls ->
@@ -81,7 +81,7 @@ poll_elevator(DriverPid, NumFloors) ->
     Floor = elevator_interface:get_floor_sensor_state(DriverPid),
     CabCalls = get_cab_calls(DriverPid, NumFloors-1),
 
-    #elevator{floor=Floor, cabRequests=CabCalls}.
+    #elevator{floor=Floor, cabCalls=CabCalls}.
 
 get_cab_calls(Pid, 0) ->
     [elevator_interface:get_order_button_state(Pid, 0, cab) =:= 1];

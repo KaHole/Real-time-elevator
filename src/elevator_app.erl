@@ -39,7 +39,7 @@ make_world_state(Elevator) ->
     {[LocalElevator], HallRequests}.
     
 make_elevator() ->
-    CabRequests = lists:duplicate(?NUM_FLOORS, false),
-    #elevator{cabRequests=CabRequests}.
+    CabCalls = lists:duplicate(?NUM_FLOORS, false),
+    #elevator{cabCalls=CabCalls}.
 
 make_hall_calls() -> lists:duplicate(?NUM_FLOORS, [false, false]).

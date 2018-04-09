@@ -22,13 +22,13 @@ init(Pid, _) ->
 
 elevator_controller(Pid) -> 
     % Checks for pressed cab floor panel buttons
-    % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabRequests)),
+    % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabCalls)),
     timer:sleep(250),
     state_poller ! {get_state, self()},
     receive
         {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
-            CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabRequests, HallCalls)],
+            CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabCalls, HallCalls)],
             % Figure out which direction to go
             _State = elevator_algorithm(State, CabHallCall),
 
@@ -42,10 +42,10 @@ elevator_controller(Pid) ->
     elevator_controller(Pid).
 
 elevator_algorithm(State, CabHallCall) ->
-    % {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, State#elevator.cabRequests),
+    % {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, State#elevator.cabCalls),
 
     % Go_up = lists:any(fun(X) -> X end, 
-    %     [lists:nth(State#elevator.floor+1, State#elevator.cabRequests)] ++ Cab_request_up
+    %     [lists:nth(State#elevator.floor+1, State#elevator.cabCalls)] ++ Cab_request_up
     % ),
 
     {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, CabHallCall),
@@ -78,7 +78,7 @@ elevator_algorithm(State, CabHallCall) ->
                 State#elevator{
                     behaviour=idle,
                     direction=stop,
-                    cabRequests=lists:duplicate(length(State#elevator.cabRequests), false)
+                    cabCalls=lists:duplicate(length(State#elevator.cabCalls), false)
                 }
         end;
         _ -> State
@@ -87,7 +87,7 @@ elevator_algorithm(State, CabHallCall) ->
 check_arrival(Pid, State, CabHallCall, HallCalls) ->
     % StopAtFloor = lists:nth(
     %     State#elevator.floor+1,
-    %     State#elevator.cabRequests
+    %     State#elevator.cabCalls
     % ),
 
     StopAtFloor = lists:nth(
@@ -113,9 +113,9 @@ stop_at_floor(Pid, State, HallCalls) ->
     elevator_interface:set_door_open_light(Pid, off), % Close within 5 seconds?
     
     _State = State#elevator{
-        cabRequests=setnth(
+        cabCalls=setnth(
             State#elevator.floor+1,
-            State#elevator.cabRequests,
+            State#elevator.cabCalls,
             done
         )
     },
