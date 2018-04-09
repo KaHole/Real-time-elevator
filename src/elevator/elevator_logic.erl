@@ -84,7 +84,7 @@ elevator_controller(Pid) ->
     receive
         {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
-            CabHallCall = [ Cab or Up or Down || {Cab,{Up,Down}} <- lists:zip(State#elevator.cabRequests, HallCalls)]
+            CabHallCall = [ Cab or Up or Down || {Cab,{Up,Down}} <- lists:zip(State#elevator.cabRequests, HallCalls)],
             
             % Figure out which direction to go
             _State = elevator_algorithm(State, CabHallCall),
@@ -164,7 +164,7 @@ stop_at_floor(Pid, State, HallCalls) ->
     elevator_interface:set_door_open_light(Pid, on),
     timer:sleep(2000),  % Remain open for 2 sec. Alt. move to case beneath.
     case elevator_interface:get_obstruction_switch_state(Pid) of
-        1 -> stop_at_floor(Pid, State);
+        1 -> stop_at_floor(Pid, State, HallCalls);
         _ -> ok
     end,
     elevator_interface:set_door_open_light(Pid, off), % Close within 5 seconds?
@@ -191,7 +191,7 @@ stop_at_floor(Pid, State, HallCalls) ->
             HallCalls,
             {Up, done}
         );
-        _ -> ok
+        true -> HallCalls
     end,
     {_State, _HallCalls}.
 
