@@ -21,6 +21,18 @@ Modules
 - [x] Node discovery
 - [x] Elevator driver (premade)
 
+Release
+----
+    $ rebar3 release
+
+Notes on generating binary:
+
+- A release on linux will run on linux (no cross-platform releases)
+- No config files allowed, ikke noe problem egentlig, det bruker vi kun til testing
+- `include_erts` gjør at erlang ikke trenger å være installert, og sikrer riktig kjøring uansett versjon på maskinen
+- 
+
+----
 
 Build & Run
 ----
@@ -30,11 +42,6 @@ Build
 ----
     $ rebar3 compile
 
-Release
-----
-    $ rebar3 release
-
-----
 
 ![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/raw/master/doc/Sanntid_moduler.png)
 
