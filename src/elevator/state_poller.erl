@@ -35,8 +35,6 @@ state_server(Elevator, HallCalls) ->
             end,
 
             % io:format("~p~n", [_Elevator]),
-            
-
             state_server(_Elevator, HallCalls);
 
         {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabCalls=CabCalls}, ActedHallCalls}} ->

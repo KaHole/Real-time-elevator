@@ -9,8 +9,6 @@ port=15657
 
 tmux -2 new-session -d -s $SESSION
 
-tmux -2 new-session -d -s $SESSION
-
 tmux split-window -h
 
 # Left panes
