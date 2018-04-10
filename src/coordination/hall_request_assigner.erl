@@ -6,9 +6,9 @@
 % Tester hall_request_assigner for debugging bare
 test() ->
     Elevator = {node(), #elevator{cabCalls=[false, false, false, false], floor=1}},
-    HallRequests = [{#hallRequest{state=accepted}, #hallRequest{}},
+    HallRequests = [{#hallRequest{}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}},
-                    {#hallRequest{}, #hallRequest{}},
+                    {#hallRequest{state=accepted}, #hallRequest{}},
                     {#hallRequest{}, #hallRequest{}}],
     Elevators = [Elevator],
     assign({Elevators, HallRequests}).
@@ -39,9 +39,9 @@ hall_requests_to_json(HallRequests) ->
                            [HallUp#hallRequest.state =:= accepted, HallDown#hallRequest.state =:= accepted] end,
                    HallRequests)).
 
-elevator_to_json({Id, #elevator{behaviour=Behaviour, floor=Floor, direction=Dir, cabCalls=CabRequests}}) ->
-    io_lib:format("\"~s\" : {\"behaviour\": \"~s\", \"floor\": ~p, \"direction\": \"~s\", \"cabCalls\": ~s}",
-                  [Id, Behaviour, Floor, Dir, json(CabRequests)]).
+elevator_to_json({Id, #elevator{behaviour=Behaviour, floor=Floor, direction=Dir, cabCalls=CabCalls}}) ->
+    io_lib:format("\"~s\" : {\"behaviour\": \"~s\", \"floor\": ~p, \"direction\": \"~s\", \"cabRequests\": ~s}",
+                  [Id, Behaviour, Floor, Dir, json(CabCalls)]).
 
 json(Data) ->
     binary_to_list(jsone:encode(Data)).

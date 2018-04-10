@@ -34,7 +34,8 @@ state_server(Elevator, HallCalls) ->
                 true -> ok
             end,
 
-            io:format("~p~n", [_Elevator]),
+            % io:format("~p~n", [_Elevator]),
+            
 
             state_server(_Elevator, HallCalls);
 

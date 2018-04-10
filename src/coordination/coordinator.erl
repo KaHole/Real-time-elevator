@@ -12,6 +12,9 @@ observe(Elevators, HallRequests) ->
             io:fwrite("local elevator ~n"),
             _Elevators = update_elevator(Elevators, node(), Elevator),
             _HallRequests = update_hall_requests(HallRequests, HallCalls),
+
+            %TODO: Assign hall_requests here????? PROBABLY NO POINT
+
             broadcast_state(Elevator, _HallRequests);
 
         {elevator_update, Id, Elevator, ExternalHallRequests} ->
@@ -20,7 +23,7 @@ observe(Elevators, HallRequests) ->
             _Elevators = update_elevator(Elevators, Id, Elevator),
             _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
-            % TODO: Check for changes? otherwise we get SPAM!
+            % Check for changes? otherwise we get SPAM!
             if
                 _HallRequests =/= HallRequests ->
                     % TODO: is this local elevator data redundant / stale.. does it matter?
@@ -29,6 +32,7 @@ observe(Elevators, HallRequests) ->
                 true -> ok
             end,
 
+            %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
             % Send assigned hall-requests to elevator logic
@@ -49,7 +53,6 @@ observe(Elevators, HallRequests) ->
     end,
     observe(_Elevators, _HallRequests).
 
-% General TODO: Pass på HallRequest vs HallCalls over alt! Samme med CabCalls (CabRequests skal ikke egentlig finnes)
 
 update_elevator(Elevators, Id, Elevator) ->
     lists:keystore(Id, 1, Elevators, {Id, Elevator}).
