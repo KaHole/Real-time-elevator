@@ -85,6 +85,7 @@ elevator_algorithm(State, CabHallCall) ->
     end.
 
 check_arrival(Pid, State, CabHallCall, HallCalls) ->
+
     CabStop = lists:nth(
         State#elevator.floor+1,
         State#elevator.cabCalls
@@ -96,7 +97,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
     ),
 
     Tmp1 = lists:any(fun(X) -> X end, headnth(State#elevator.floor+1, CabHallCall)),
-    io:format("Tmp1: ~p~n", [Tmp1]),
+
     HallUpStop = if
         HallUp and (State#elevator.direction == up) -> true;
         HallUp and (State#elevator.direction == down) and (not Tmp1) -> true;

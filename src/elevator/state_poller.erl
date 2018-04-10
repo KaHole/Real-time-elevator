@@ -46,6 +46,9 @@ state_server(Elevator, HallCalls) ->
 
             _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
+            % Set done HallCalls to false
+            _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
+
             HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
             if
                 (Elevator#elevator.cabCalls =/= _CabCalls)
@@ -57,7 +60,7 @@ state_server(Elevator, HallCalls) ->
                 true -> ok
             end,
 
-            state_server(_Elevator, HallCalls);
+            state_server(_Elevator, _HallCalls);
 
         {set_hall_calls, _HallCalls} -> state_server(Elevator, _HallCalls);
 
@@ -65,6 +68,18 @@ state_server(Elevator, HallCalls) ->
     end,
 
     state_server(Elevator, HallCalls).
+
+disarm_hall_calls([], []) -> [];
+disarm_hall_calls([[HallUp, HallDown] | Tail], [[ActedHallUp, ActedHallDown] | ActedTail]) ->
+    _HallUp = case ActedHallUp of
+        done -> false;
+        _ -> HallUp
+    end,
+    _HallDown = case ActedHallDown of
+        done -> false;
+        _ -> HallDown
+    end,
+    [[_HallUp, _HallDown] | disarm_hall_calls(Tail, ActedTail)].
 
 
 poller(DriverPid, NumFloors) ->

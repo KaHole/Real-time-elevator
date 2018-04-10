@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # nodes=( one two three four )
-nodes=( one two )
+nodes=( one two three four )
 port=15657
 
 for node in "${nodes[@]}"
