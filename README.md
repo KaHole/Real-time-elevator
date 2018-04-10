@@ -47,25 +47,9 @@ Build
 
 ----
 
-Learning Resources
------
-
-http://erlangbyexample.org/
-
-http://learnyousomeerlang.com/content
-
-https://learnxinyminutes.com/docs/erlang/
-
-https://www.rebar3.org/
-
-Consensus reading
------
-
-https://raft.github.io/
-
-https://en.wikipedia.org/wiki/State_machine_replication
-
-https://people.cs.umass.edu/~arun/cs677/notes/week6.pdf
-
-http://www.cs.cornell.edu/fbs/publications/SMSurvey.pdf
-
+Built using
+----
+- `Erlang`
+- [jsone](https://github.com/sile/jsone)
+- [Elevator driver](https://github.com/TTK4145/driver-erlang)
+- [Hall request assigner](https://github.com/TTK4145/Project-resources/tree/master/cost_fns/hall_request_assigner)
