@@ -14,7 +14,7 @@ start(_StartType, _StartArgs) ->
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
 
-    % Release skal helst starte alt (inkludert hardware-driveren) med en binary om mulig, uten config
+    % Release skal helst starte alt med en binary om mulig, uten config
 
     %TODO: Fjerne dette før release
     {_, Port} = application:get_env(port),
