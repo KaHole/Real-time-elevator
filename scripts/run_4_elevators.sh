@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# nodes=( one two three four )
 nodes=( one two three four )
 port=15657
 
