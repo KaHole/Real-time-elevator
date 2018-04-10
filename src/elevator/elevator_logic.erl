@@ -42,12 +42,6 @@ elevator_controller(Pid) ->
     elevator_controller(Pid).
 
 elevator_algorithm(State, CabHallCall) ->
-    % {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, State#elevator.cabCalls),
-
-    % Go_up = lists:any(fun(X) -> X end, 
-    %     [lists:nth(State#elevator.floor+1, State#elevator.cabCalls)] ++ Cab_request_up
-    % ),
-
     {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, CabHallCall),
 
     Go_up = lists:any(fun(X) -> X end, 
@@ -143,36 +137,6 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
     end,
     {_State, _HallCalls}.
 
-    % if
-    %     % If cabcall on floor 
-    %     CabStop -> 
-    %         stop_at_floor(Pid, State, HallCalls);
-    %     % If hallcall up on floor and direction is up
-    %     StopUp and State#elevator.direction == up -> 
-    %         stop_at_floor(Pid, State, HallCalls);
-    %     % If hallcall down on floor and direction is down
-    %     StopDown and State#elevator.direction == down -> 
-    %         stop_at_floor(Pid, State, HallCalls);
-    %     % If hallcall down and no other calls in direction of travel
-    %     StopDown and State#elevator.direction == up and not lists:any(fun(X) -> X end, lists:nthtail(State#elevator.floor+1, CabHallCall)) ->
-    %         stop_at_floor(Pid, State, HallCalls);
-    %     % If hallcall up and no other calls in direction of travel
-    %     StopUp and State#elevator.direction == down and not lists:any(fun(X) -> X end, lists:headnth(State#elevator.floor+1, CabHallCall)) ->
-    %         stop_at_floor(Pid, State, HallCalls);
-    %     _ -> ok
-    % end.
-    % StopAtFloor = lists:nth(
-    %     State#elevator.floor+1,
-    %     CabHallCall
-    % ),
-
-    % If we stop return new state, else return old
-    % case StopAtFloor of
-    %     true -> stop_at_floor(Pid, State, HallCalls);
-    %     _ -> {State, HallCalls}
-    % end.
-
-
 stop_at_floor(Pid, State, HallCalls) ->
     elevator_interface:set_motor_direction(Pid, stop),
     elevator_interface:set_order_button_light(Pid, cab, State#elevator.floor, off),
@@ -183,46 +147,6 @@ stop_at_floor(Pid, State, HallCalls) ->
         _ -> ok
     end,
     elevator_interface:set_door_open_light(Pid, off). % Close within 5 seconds?
-
-% mark_calls_done() ->
-%     _State = State#elevator{
-%         cabCalls=setnth(
-%             State#elevator.floor+1,
-%             State#elevator.cabCalls,
-%             done
-%         )
-%     },
-%     [Up, Down] = lists:nth(
-%         State#elevator.floor+1,
-%         HallCalls
-%     ),
-%     _HallCalls = if 
-%         % Top floor, only down possible
-%         Down and State#elevator.floor == length(HallCalls)-1 -> setnth(
-%             State#elevator.floor+1,
-%             HallCalls,
-%             [false, done]
-%         );
-%         % Bottom floor, only up possible
-%         Up and State#elevator.floor == 0 -> setnth(
-%             State#elevator.floor+1,
-%             HallCalls,
-%             [done, false]
-%         );
-%         Up and State#elevator.direction == up -> setnth(
-%             State#elevator.floor+1,
-%             HallCalls,
-%             [done, Down]
-%         );
-%         Down and State#elevator.direction == down -> setnth(
-%             State#elevator.floor+1,
-%             HallCalls,
-%             [Up, done]
-%         );
-%         true -> HallCalls
-%     end,
-%     {_State, _HallCalls}.
-
 
 % https://stackoverflow.com/questions/4776033/how-to-change-an-element-in-a-list-in-erlang
 setnth(1, [_|Rest], New) -> [New|Rest];
