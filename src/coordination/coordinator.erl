@@ -13,7 +13,7 @@ observe(Elevators, HallRequests) ->
             _Elevators = update_elevator(Elevators, node(), Elevator),
             _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
-            %TODO: Assign hall_requests here????? PROBABLY NO POINT
+            %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
 
             broadcast_state(Elevator, _HallRequests);
 
