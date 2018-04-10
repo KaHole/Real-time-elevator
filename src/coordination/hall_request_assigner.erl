@@ -2,20 +2,6 @@
 -include("../../include/worldstate.hrl").
 -export([assign/1, test/0]).
 
-%-----------------------------
-% Tester hall_request_assigner for debugging bare
-test() ->
-    Elevator = {node(), #elevator{cabCalls=[false, false, false, false], floor=1}},
-    HallRequests = [{#hallRequest{}, #hallRequest{}},
-                    {#hallRequest{}, #hallRequest{}},
-                    {#hallRequest{state=accepted}, #hallRequest{}},
-                    {#hallRequest{}, #hallRequest{}}],
-    Elevators = [Elevator],
-    assign({Elevators, HallRequests}).
-    % jsone:encode([false,false,false,false]).
-
-%-----------------------------
-
 assign({Elevators, HallRequests}) ->
 
     % Filters on active nodes, only active nodes should be taken in account

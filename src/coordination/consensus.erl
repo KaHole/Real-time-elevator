@@ -2,12 +2,6 @@
 -include("../../include/worldstate.hrl").
 -export([consense/2, merge_hall_request_lists/2, test/0]).
 
-
-test() ->
-    consense([{#hallRequest{state=nothing}, #hallRequest{state=nothing}}], [{#hallRequest{state=new, observedBy=[node()]}, #hallRequest{state=nothing}}]).
-
-%--------------
-
 consense(HallRequests, ExternalHallRequests) ->
 
     MergedHallRequests = merge_hall_request_lists(HallRequests, ExternalHallRequests),
@@ -40,23 +34,22 @@ consense_floor({HallUp, HallDown}) ->
 
 consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 
+consense_request(#hallRequest{state=accepted, observedBy=ObservedBy}) ->
+
+    _ObservedBy = observe(ObservedBy, node()),
+    #hallRequest{state=accepted, observedBy=_ObservedBy};
+
 consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
     _ObservedBy = observe(ObservedBy, node()),
     Nodes = nodes(),
 
     % TODO: Pass på at noder som ikke lenger er aktiv, ikke blir tatt med i beregningen her? det er en svakhet med å bare ta opptelling
-
-    case State of
-        accepted ->
-            #hallRequest{state=State, observedBy=_ObservedBy};
-        _ ->
-            if
-                length(Nodes) + 1 == length(_ObservedBy) ->
-                    #hallRequest{state=advance(State), observedBy=[node()]};
-                true ->
-                    #hallRequest{state=State, observedBy=_ObservedBy}
-            end
+    if
+        length(Nodes) + 1 == length(_ObservedBy) ->
+            #hallRequest{state=advance(State), observedBy=[node()]};
+        true ->
+            #hallRequest{state=State, observedBy=_ObservedBy}
     end.
 
 observe(ObservedBy, Node) ->

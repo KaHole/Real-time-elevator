@@ -44,7 +44,7 @@ state_server(Elevator, HallCalls) ->
 
             _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
-            % Set done HallCalls to false
+            % TODO: do we need this?   -  Set done HallCalls to false
             _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
 
             HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
