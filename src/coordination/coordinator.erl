@@ -33,7 +33,6 @@ observe(Elevators, HallRequests) ->
                         io:fwrite("HallRequest changes above!! ~n"),
                         io:fwrite("---------------------------------~n"),
                         io:fwrite("---------------------------------~n"),
-                    % TODO: is this local elevator data redundant / stale.. does it matter?
                     {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
                     broadcast_state(LocalElevator, _HallRequests);
                 true -> ok
@@ -42,7 +41,7 @@ observe(Elevators, HallRequests) ->
             %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
-            % Send assigned hall-requests to elevator logic
+            % Sends assigned hall-requests to elevator logic
             state_poller ! {set_hall_calls, AssignedHallCalls}
     end,
     observe(_Elevators, _HallRequests).
