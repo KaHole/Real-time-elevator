@@ -67,10 +67,11 @@ consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
     % TODO: Pass på at noder som ikke lenger er aktiv, ikke blir tatt med i beregningen her? det er en svakhet med å bare ta opptelling
     if
         length(Nodes) + 1 == length(_ObservedBy) ->
-            case State of
-                done -> #hallRequest{};
-                _ -> #hallRequest{state=advance(State), observedBy=[node()]}
-            end;
+            #hallRequest{state=advance(State)};
+            %case State of
+            %    done -> #hallRequest{};
+            %    _ -> #hallRequest{state=advance(State), observedBy=[node()]}
+            %end;
         true ->
             #hallRequest{state=State, observedBy=_ObservedBy}
     end.
