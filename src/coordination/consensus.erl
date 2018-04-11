@@ -30,7 +30,9 @@ merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallReque
 merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=done}) -> HallRequest1;
 
 % TODO: Tror denne blir riktig:
-merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
+merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) ->
+    io:fwrite("TRIGGER ACCEPTED~n"),
+    HallRequest1;
 
 merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
 
