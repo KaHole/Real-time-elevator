@@ -23,6 +23,7 @@ init(Pid, _) ->
 
 elevator_controller(Pid) -> 
 
+    % TODO: needs testing of different rates
     %timer:sleep(250),
     timer:sleep(125),
     state_poller ! {get_state, self()},

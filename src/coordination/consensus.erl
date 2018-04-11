@@ -21,7 +21,7 @@ merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallReque
 
 merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequest2) -> HallRequest2;
 
-% TODO: Experimenterer med denne! tror den er fornuftig når man tenker skikkelig gjennom
+% TODO: Denne skal også vekk! tenk gjennom
 % merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
 
 % Kanskje, tenk nøye gjennom
@@ -29,7 +29,6 @@ merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequ
 % TODO: DENNE DERIMOT ER SKETCHY! hva om en kommer inn når det skal bli enighet om done!:
 % merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=done}) -> HallRequest1;
 
-% TODO: Tror denne blir riktig:
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
 merge_requests(#hallRequest{state=State1, observedBy=ObservedBy1} = HallRequest1,
@@ -55,9 +54,6 @@ consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 %TODO: Tror bare den trenger dette:
 consense_request(#hallRequest{state=accepted} = HallRequest) -> HallRequest;
 %consense_request(#hallRequest{state=accepted, observedBy=ObservedBy}) ->
-%
-%    _ObservedBy = observe(ObservedBy, node()),
-%    #hallRequest{state=accepted, observedBy=_ObservedBy};
 
 consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
