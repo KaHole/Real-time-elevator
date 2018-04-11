@@ -63,7 +63,7 @@ state_server(Elevator, HallCalls) ->
         {set_hall_calls, _HallCalls} -> state_server(Elevator, _HallCalls);
 
         {get_state, Sender} ->
-            io:fwrite("get_state ~n");
+            io:fwrite("get_state ~n"),
             Sender ! {updated_state, {Elevator, HallCalls}}
     end,
 
