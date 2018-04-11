@@ -41,6 +41,8 @@ observe(Elevators, HallRequests) ->
             %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
 
+            io:format("~p~n", [_HallRequests]),
+
             % Sends assigned hall-requests to elevator logic
             state_poller ! {set_hall_calls, AssignedHallCalls}
     end,

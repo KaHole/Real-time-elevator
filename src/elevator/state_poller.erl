@@ -62,9 +62,7 @@ state_server(Elevator, HallCalls) ->
 
             state_server(_Elevator, _HallCalls);
 
-        {set_hall_calls, _HallCalls} ->
-            io:format("SET ~p~n", [_HallCalls]),
-            state_server(Elevator, _HallCalls);
+        {set_hall_calls, _HallCalls} -> state_server(Elevator, _HallCalls);
 
         {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
     end,
