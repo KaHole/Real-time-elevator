@@ -52,7 +52,7 @@ observe(Elevators, HallRequests) ->
     observe(_Elevators, _HallRequests).
 
 handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
-    io:fwrite("local elevator ~n"),
+    %io:fwrite("local elevator ~n"),
     _Elevators = update_elevator(Elevators, node(), Elevator),
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
