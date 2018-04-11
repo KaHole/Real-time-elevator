@@ -9,9 +9,13 @@ observe(Elevators, HallRequests) ->
     receive
         {local_elevator_update, Elevator, HallCalls} ->
 
+            io:fwrite("----------------------------------------------~n"),
             io:fwrite("local elevator ~n"),
             _Elevators = update_elevator(Elevators, node(), Elevator),
             _HallRequests = update_hall_requests(HallRequests, HallCalls),
+
+            io:format("~p~n", [_HallRequests]),
+            io:fwrite("----------------------------------------------~n"),
 
             %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
 
@@ -37,6 +41,9 @@ observe(Elevators, HallRequests) ->
                     broadcast_state(LocalElevator, _HallRequests);
                 true -> ok
             end,
+
+            io:format("~p~n", [_HallRequests]),
+            io:fwrite("----------------------------------------------~n"),
 
             %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
             AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
