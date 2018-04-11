@@ -21,6 +21,9 @@ merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallReque
 
 merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequest2) -> HallRequest2;
 
+%TODO: Experimenterer med denne! tror den er fornuftig når man tenker skikkelig gjennom
+merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
+
 merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
 
     ObsBySet1 = sets:from_list(ObservedBy1),
