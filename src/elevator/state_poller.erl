@@ -48,6 +48,13 @@ state_server(Elevator, HallCalls) ->
             _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
 
             HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
+
+            %TODO: REMOVE
+            if
+                HasDoneHallCalls -> io:fwrite("DONE SIGNAL~n");
+                true -> ok
+            end,
+
             if
                 (Elevator#elevator.cabCalls =/= _CabCalls)
                 or (Elevator#elevator.behaviour =/= Behaviour)
