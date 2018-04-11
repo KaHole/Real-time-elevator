@@ -24,6 +24,7 @@ merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequ
 % TODO: Experimenterer med denne! tror den er fornuftig når man tenker skikkelig gjennom
 merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
 
+% Kanskje, tenk nøye gjennom
 % DENNE SKAL VEKK! PROBLEMET FIKSES NÅR PROBLEMET MED AT DEN Åpner døren to ganger fikses!!
 % TODO: DENNE DERIMOT ER SKETCHY! hva om en kommer inn når det skal bli enighet om done!:
 merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=done}) -> HallRequest1;

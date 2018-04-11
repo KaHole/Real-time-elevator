@@ -156,10 +156,7 @@ stop_at_floor(Pid, State, HallCalls) ->
         1 -> stop_at_floor(Pid, State, HallCalls);
         _ -> ok
     end,
-    elevator_interface:set_door_open_light(Pid, off), % Close within 5 seconds?
-    
-    % TODO: This is a hacky fix
-    timer:sleep(2000).
+    elevator_interface:set_door_open_light(Pid, off). % Close within 5 seconds?
 
 % https://stackoverflow.com/questions/4776033/how-to-change-an-element-in-a-list-in-erlang
 setnth(1, [_|Rest], New) -> [New|Rest];
