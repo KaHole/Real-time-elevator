@@ -10,31 +10,12 @@ observe(Elevators, HallRequests) ->
     receive
         {local_elevator_update, Elevator, HallCalls} ->
 
-            io:fwrite("local elevator ~n"),
-            _Elevators = update_elevator(Elevators, node(), Elevator),
-            _HallRequests = update_hall_requests(HallRequests, HallCalls),
-
-            io:format("~p~n", [_HallRequests]),
-            %io:fwrite("----------------------------------------------~n"),
-
-            %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
-
-            broadcast_state(Elevator, _HallRequests)
-
+            {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls)
 
         after 0 -> receive
             {local_elevator_update, Elevator, HallCalls} ->
 
-                io:fwrite("local elevator ~n"),
-                _Elevators = update_elevator(Elevators, node(), Elevator),
-                _HallRequests = update_hall_requests(HallRequests, HallCalls),
-
-                io:format("~p~n", [_HallRequests]),
-                %io:fwrite("----------------------------------------------~n"),
-
-                %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
-
-                broadcast_state(Elevator, _HallRequests);
+                {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls);
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
@@ -69,6 +50,19 @@ observe(Elevators, HallRequests) ->
     end,
 
     observe(_Elevators, _HallRequests).
+
+handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
+    io:fwrite("local elevator ~n"),
+    _Elevators = update_elevator(Elevators, node(), Elevator),
+    _HallRequests = update_hall_requests(HallRequests, HallCalls),
+
+    io:format("~p~n", [_HallRequests]),
+    %io:fwrite("----------------------------------------------~n"),
+
+    %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
+
+    broadcast_state(Elevator, _HallRequests),
+    {_Elevators, _HallRequests}.
 
 
 update_elevator(Elevators, Id, Elevator) ->
