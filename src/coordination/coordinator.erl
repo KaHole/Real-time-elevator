@@ -6,6 +6,7 @@ start({Elevators, HallRequests}) ->
     register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
 observe(Elevators, HallRequests) ->
+
     receive
         {local_elevator_update, Elevator, HallCalls} ->
 
@@ -18,38 +19,55 @@ observe(Elevators, HallRequests) ->
 
             %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
 
-            broadcast_state(Elevator, _HallRequests);
+            broadcast_state(Elevator, _HallRequests)
 
-        {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
-            io:fwrite("foreign elevator ~n"),
-            _Elevators = update_elevator(Elevators, Id, Elevator),
-            _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
+        after 0 -> receive
+            {local_elevator_update, Elevator, HallCalls} ->
 
-            % Check for changes? otherwise we get SPAM!
-            % io:fwrite("---------------------------------~n"),
-            % io:format("~p~n", [HallRequests]),
-            io:format("~p~n", [ExternalHallRequests]),
-            % io:fwrite("---------------------------------~n"),
-            if
-                _HallRequests =/= HallRequests ->
-                        %io:fwrite("HallRequest changes above!! ~n"),
-                        %io:fwrite("---------------------------------~n"),
-                        %io:fwrite("---------------------------------~n"),
-                    {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-                    broadcast_state(LocalElevator, _HallRequests);
-                true -> ok
-            end,
+                io:fwrite("local elevator ~n"),
+                _Elevators = update_elevator(Elevators, node(), Elevator),
+                _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
-            %io:format("~p~n", [_HallRequests]),
-            %io:fwrite("----------------------------------------------~n"),
+                io:format("~p~n", [_HallRequests]),
+                %io:fwrite("----------------------------------------------~n"),
 
-            %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
-            AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
+                %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
 
-            % Sends assigned hall-requests to elevator logic
-            state_poller ! {set_hall_calls, AssignedHallCalls}
+                broadcast_state(Elevator, _HallRequests);
+
+            {elevator_update, Id, Elevator, ExternalHallRequests} ->
+
+                io:fwrite("foreign elevator ~n"),
+                _Elevators = update_elevator(Elevators, Id, Elevator),
+                _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
+
+                % Check for changes? otherwise we get SPAM!
+                % io:fwrite("---------------------------------~n"),
+                % io:format("~p~n", [HallRequests]),
+                io:format("~p~n", [ExternalHallRequests]),
+                % io:fwrite("---------------------------------~n"),
+                if
+                    _HallRequests =/= HallRequests ->
+                            %io:fwrite("HallRequest changes above!! ~n"),
+                            %io:fwrite("---------------------------------~n"),
+                            %io:fwrite("---------------------------------~n"),
+                        {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
+                        broadcast_state(LocalElevator, _HallRequests);
+                    true -> ok
+                end,
+
+                %io:format("~p~n", [_HallRequests]),
+                %io:fwrite("----------------------------------------------~n"),
+
+                %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
+                AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
+
+                % Sends assigned hall-requests to elevator logic
+                state_poller ! {set_hall_calls, AssignedHallCalls}
+        end
     end,
+
     observe(_Elevators, _HallRequests).
 
 
