@@ -29,8 +29,8 @@ state_server(Elevator, HallCalls) ->
                 (Elevator#elevator.cabCalls =/= _CabCalls)
                 or (Elevator#elevator.floor =/= _Floor)
                 or HasIncomingHallCalls ->
-                    coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls},
-                    io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
+                    coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls};
+                    %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
                 true -> ok
             end,
 
@@ -44,6 +44,8 @@ state_server(Elevator, HallCalls) ->
 
             _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
+            io:format("ACTED ~p~n", [ActedHallCalls]),
+
             % TODO: do we need this?   -  Set done HallCalls to false
             _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
 
@@ -53,14 +55,16 @@ state_server(Elevator, HallCalls) ->
                 or (Elevator#elevator.behaviour =/= Behaviour)
                 or (Elevator#elevator.direction =/= Direction)
                 or HasDoneHallCalls ->
-                    coordinator ! {local_elevator_update, _Elevator, ActedHallCalls},
-                    io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
+                    coordinator ! {local_elevator_update, _Elevator, ActedHallCalls};
+                    %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
                 true -> ok
             end,
 
             state_server(_Elevator, _HallCalls);
 
-        {set_hall_calls, _HallCalls} -> state_server(Elevator, _HallCalls);
+        {set_hall_calls, _HallCalls} ->
+            io:format("SET ~p~n", [_HallCalls]),
+            state_server(Elevator, _HallCalls);
 
         {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
     end,

@@ -20,11 +20,14 @@ init(Pid, #elevator{floor=between_floors}) ->
 init(Pid, _) -> 
     elevator_interface:set_motor_direction(Pid, stop).
 
+
 elevator_controller(Pid) -> 
-    % Checks for pressed cab floor panel buttons
-    % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabCalls)),
-    % timer:sleep(250),
+
+    % TODO: Is this right, with the "after" and such?
+
+    timer:sleep(250),
     state_poller ! {get_state, self()},
+
     receive
         {updated_state, {State, HallCalls}} -> 
             % Handle hall calls as cab calls temporarily for determining direction of elevator
@@ -38,6 +41,7 @@ elevator_controller(Pid) ->
             elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
             elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
             %state_poller ! {driven_state_update, {NewState, _HallCalls}}
+        %after 1000 -> ok
     end,
     elevator_controller(Pid).
 
