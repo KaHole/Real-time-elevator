@@ -23,7 +23,7 @@ init(Pid, _) ->
 elevator_controller(Pid) -> 
     % Checks for pressed cab floor panel buttons
     % Polled_panel_state = get_floor_panel_state(Pid, [], length(State#elevator.cabCalls)),
-    timer:sleep(250),
+    % timer:sleep(250),
     state_poller ! {get_state, self()},
     receive
         {updated_state, {State, HallCalls}} -> 
