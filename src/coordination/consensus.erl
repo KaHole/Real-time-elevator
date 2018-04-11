@@ -1,6 +1,6 @@
 -module(consensus).
 -include("../../include/worldstate.hrl").
--export([consense/2, merge_hall_request_lists/2, test/0]).
+-export([consense/2, merge_hall_request_lists/2]).
 
 consense(HallRequests, ExternalHallRequests) ->
 

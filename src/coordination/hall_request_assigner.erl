@@ -1,6 +1,6 @@
 -module(hall_request_assigner).
 -include("../../include/worldstate.hrl").
--export([assign/1, test/0]).
+-export([assign/1]).
 
 assign({Elevators, HallRequests}) ->
     

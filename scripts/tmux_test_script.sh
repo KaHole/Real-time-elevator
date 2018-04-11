@@ -1,5 +1,7 @@
 #!/bin/bash
-SESSION=$USER
+
+#SESSION=$USER
+SESSION="test"
 
 cd "../"
 declare -a nodes=( one two three four )
