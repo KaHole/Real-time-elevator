@@ -32,10 +32,11 @@ merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=do
 % TODO: Tror denne blir riktig:
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
-merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
+merge_requests(#hallRequest{state=State, observedBy=ObservedBy1} = HallRequest1,
+               #hallRequest{state=State, observedBy=ObservedBy2}) ->
 
     _ObservedBy = if
-        ObservedBy1 =:= ObservedBy2 ->
+        State =:= State ->
             ObsBySet1 = sets:from_list(ObservedBy1),
             ObsBySet2 = sets:from_list(ObservedBy2),
             sets:to_list(sets:union(ObsBySet1, ObsBySet2));
