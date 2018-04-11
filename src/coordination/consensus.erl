@@ -29,6 +29,9 @@ merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallReque
 % TODO: DENNE DERIMOT ER SKETCHY! hva om en kommer inn når det skal bli enighet om done!:
 merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=done}) -> HallRequest1;
 
+% TODO: Tror denne blir riktig:
+merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
+
 merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, #hallRequest{observedBy=ObservedBy2}) ->
 
     ObsBySet1 = sets:from_list(ObservedBy1),
@@ -42,10 +45,12 @@ consense_floor({HallUp, HallDown}) ->
 
 consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 
-consense_request(#hallRequest{state=accepted, observedBy=ObservedBy}) ->
-
-    _ObservedBy = observe(ObservedBy, node()),
-    #hallRequest{state=accepted, observedBy=_ObservedBy};
+%TODO: Tror bare den trenger dette:
+consense_request(#hallRequest{state=accepted} = HallRequest) -> HallRequest;
+%consense_request(#hallRequest{state=accepted, observedBy=ObservedBy}) ->
+%
+%    _ObservedBy = observe(ObservedBy, node()),
+%    #hallRequest{state=accepted, observedBy=_ObservedBy};
 
 consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
