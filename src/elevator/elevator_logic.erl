@@ -36,7 +36,7 @@ elevator_controller(Pid) ->
             {NewState, _HallCalls} = check_arrival(Pid, _State, CabHallCall, HallCalls),
 
             elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
-            elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor),
+            elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
             %state_poller ! {driven_state_update, {NewState, _HallCalls}}
     end,
     elevator_controller(Pid).
@@ -130,7 +130,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         true -> HallCalls
     end,
 
-    state_poller ! {driven_state_update, {_State, _HallCalls}}
+    state_poller ! {driven_state_update, {_State, _HallCalls}},
 
     if
         CabStop or HallUpStop or HallDownStop ->
