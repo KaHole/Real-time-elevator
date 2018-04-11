@@ -23,9 +23,8 @@ init(Pid, _) ->
 
 elevator_controller(Pid) -> 
 
-    % TODO: Is this right, with the "after" and such?
-
-    timer:sleep(250),
+    %timer:sleep(250),
+    timer:sleep(125),
     state_poller ! {get_state, self()},
 
     receive
@@ -41,7 +40,6 @@ elevator_controller(Pid) ->
             elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
             elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
             %state_poller ! {driven_state_update, {NewState, _HallCalls}}
-        %after 1000 -> ok
     end,
     elevator_controller(Pid).
 
