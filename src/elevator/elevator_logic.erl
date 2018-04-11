@@ -37,7 +37,7 @@ elevator_controller(Pid) ->
 
             elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
             elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor),
-            state_poller ! {driven_state_update, {NewState, _HallCalls}}
+            %state_poller ! {driven_state_update, {NewState, _HallCalls}}
     end,
     elevator_controller(Pid).
 
@@ -104,12 +104,6 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         HallDown and (State#elevator.direction == up) and (not Tmp2) -> true;
         true -> false
     end, 
-    
-    if
-        CabStop or HallUpStop or HallDownStop ->
-            stop_at_floor(Pid, State, HallCalls);
-        true -> ok
-    end,
 
     _State = if 
         CabStop -> State#elevator{
@@ -135,6 +129,18 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         );
         true -> HallCalls
     end,
+
+    state_poller ! {driven_state_update, {_State, _HallCalls}}
+
+    if
+        CabStop or HallUpStop or HallDownStop ->
+            io:fwrite("Stopping! Opening doors~n"),
+            stop_at_floor(Pid, State, HallCalls);
+        true -> ok
+    end,
+
+    % Note cab-stop blocks so should be after message
+    % TODO: remove return value, if we keep the send statement in here
     {_State, _HallCalls}.
 
 stop_at_floor(Pid, State, HallCalls) ->
