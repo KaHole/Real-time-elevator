@@ -60,7 +60,11 @@ set_cab_button_lights(Pid, CabCalls) ->
 set_cab_button_lights_internal(_, [], _) -> ok;
 
 set_cab_button_lights_internal(Pid, [CabCall | Tail], N) ->
-    elevator_interface:set_order_button_light(Pid, cab, N, CabCall),
+    LightOn = if
+        CabCall -> on;
+        true -> off
+    end,
+    elevator_interface:set_order_button_light(Pid, cab, N, LightOn),
     set_cab_button_lights_internal(Pid, Tail, N+1).
 
 
