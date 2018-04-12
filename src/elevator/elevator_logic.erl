@@ -105,8 +105,8 @@ elevator_algorithm(State, CabHallCall) ->
         _ -> State
     end.
 
-check_arrival(Pid, #elevator{betweenFloors=true}, CabHallCall, HallCalls) ->
-    ok.
+check_arrival(_, #elevator{betweenFloors=true}, _, _) ->
+    ok;
 
 check_arrival(Pid, State, CabHallCall, HallCalls) ->
     CabStop = lists:nth(
