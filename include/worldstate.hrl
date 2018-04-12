@@ -3,7 +3,8 @@
     behaviour = idle ::atom(), % idle, moving, doorOpen
     floor = 0 ::non_neg_integer(),
     direction = stop ::atom(), % stop, up, down
-    cabCalls = [] ::[boolean()] 
+    cabCalls = [] ::[boolean()],
+    betweenFloors = false ::boolean()
 }).
 
 -record(hallRequest, {

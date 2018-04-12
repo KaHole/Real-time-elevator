@@ -16,12 +16,12 @@ state_server(Elevator, HallCalls) ->
 
             _CabCalls = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
 
-            _Floor = case Floor of
-                between_floors -> Elevator#elevator.floor;
-                _ -> Floor
+            {_Floor, _BetweenFloors} = case Floor of
+                between_floors -> {Elevator#elevator.floor, true};
+                _ -> {Floor, false}
             end,
 
-            _Elevator = Elevator#elevator{floor=_Floor, cabCalls=_CabCalls},
+            _Elevator = Elevator#elevator{floor=_Floor, cabCalls=_CabCalls, betweenFloors=_BetweenFloors},
 
             % Detect changes, send to coordinator if anything to report
             HasIncomingHallCalls = lists:any(fun(E) -> E end, lists:flatten(IncomingHallCalls)),
