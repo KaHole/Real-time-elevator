@@ -26,10 +26,22 @@ observe(Elevators, HallRequests) ->
                 % Send hall-requests to turn on/off the order lights
                 state_poller ! {set_hall_order_button_lights, _HallRequests},
 
+                HallRequestStates = lists:map(
+                    fun({HallUp, HallDown}) ->
+                        {HallUp#hallRequest.state, HallDown#hallRequest.state}
+                    end
+                , HallRequests),
+
+                _HallRequestStates = lists:map(
+                    fun({HallUp, HallDown}) ->
+                        {HallUp#hallRequest.state, HallDown#hallRequest.state}
+                    end
+                , _HallRequests),
+
                 if
-                    _HallRequests =/= HallRequests ->
+                    _HallRequestStates =/= HallRequestStates ->
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-                        io:format("~p~n", [_HallRequests]),
+                        io:format("~p~n", [_HallRequestStates]),
                         broadcast_state(LocalElevator, _HallRequests);
                     true -> ok
                 end,
