@@ -37,16 +37,17 @@ elevator_controller(Pid) ->
             % Figure out which direction to go
             _State = elevator_algorithm(State, CabHallCall),
 
-            % Check if arrive at a wanted floor
-            {NewState, _HallCalls} = check_arrival(Pid, _State, CabHallCall, HallCalls),
-
             % it ensures the elevator stops at a floor.
             % If the hallrequest gets reassigned while elevator is in motion
-            case NewState#elevator.direction of
+            case _State#elevator.direction of
                 stop ->
                     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
-                _ -> elevator_interface:set_motor_direction(Pid, NewState#elevator.direction)
-            end
+                _ -> elevator_interface:set_motor_direction(Pid, _State#elevator.direction)
+            end,
+
+            % Check if arrive at a wanted floor
+            {NewState, _HallCalls} = check_arrival(Pid, _State, CabHallCall, HallCalls)
+
     end,
     elevator_controller(Pid).
 
