@@ -23,7 +23,7 @@ assign(Elevators, HallRequestStates) ->
 
             io:format("~s~n", [" " ++ JsonState]),
 
-            Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
+            Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner -i " ++ JsonState))),
             maps:get(list_to_binary(atom_to_list(node())), Data);
 
         true -> lists:duplicate(length(HallRequestStates), [false, false])
