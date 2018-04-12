@@ -22,7 +22,7 @@ init(Pid, _) ->
 
 
 elevator_controller(Pid) -> 
-
+    % io:fwrite("ele_ctrl~n"),
     % TODO: needs testing of different rates
     %timer:sleep(250),
     timer:sleep(125),
@@ -163,7 +163,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
     if
         CabStop or HallUpStop or HallDownStop -> 
-            state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen}, _HallCalls}},
+            state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen,direction=stop}, _HallCalls}},
             stop_at_floor(Pid, State#elevator.floor);
         true -> state_poller ! {driven_state_update, {_State, _HallCalls}}
     end. 

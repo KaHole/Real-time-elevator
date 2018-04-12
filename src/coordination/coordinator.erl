@@ -6,7 +6,6 @@ start({Elevators, HallRequests}) ->
     register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
 observe(Elevators, HallRequests) ->
-
     receive
         {local_elevator_update, Elevator, HallCalls} ->
             {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls)
@@ -41,7 +40,7 @@ observe(Elevators, HallRequests) ->
                 if
                     _HallRequestStates =/= HallRequestStates ->
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-                        io:format("~p~n", [_HallRequestStates]),
+                        % io:format("~p~n", [_HallRequestStates]),
                         broadcast_state(LocalElevator, _HallRequests);
                     true -> ok
                 end,
@@ -57,7 +56,7 @@ observe(Elevators, HallRequests) ->
     observe(_Elevators, _HallRequests).
 
 handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
-    io:fwrite("local elevator ~n"),
+    % io:fwrite("local elevator ~n"),
     _Elevators = update_elevator(Elevators, node(), Elevator),
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
