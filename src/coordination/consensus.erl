@@ -17,17 +17,16 @@ merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=no
 
 merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallRequest2) -> HallRequest2;
 
+% Ny node kommer inn, må bli med?
+% TODO: nothing -> accepted ???????
+
+% DENNE ER FARLIG???
+% Men uten denne så vil ny node stucke de andre i done til nothing consensus
+% TODO: nothing -> done ???????
+
 merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
 merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequest2) -> HallRequest2;
-
-% TODO: Denne skal også vekk! tenk gjennom
-% merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
-
-% Kanskje, tenk nøye gjennom
-% DENNE SKAL VEKK! PROBLEMET FIKSES NÅR PROBLEMET MED AT DEN Åpner døren to ganger fikses!!
-% TODO: DENNE DERIMOT ER SKETCHY! hva om en kommer inn når det skal bli enighet om done!:
-% merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=done}) -> HallRequest1;
 
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
