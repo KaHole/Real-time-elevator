@@ -36,7 +36,7 @@ listen(Socket) ->
                 false ->
                     io:format("connecting to ~p~n", [List]),
                     % net_kernel:connect_node(DiscoveredNode),
-                    {test, DiscoveredNode} ! ping;
+                    {connect, DiscoveredNode} ! ping;
                 true -> ok
             end,
             io:format("Nodes: ~p~n", [nodes()])
