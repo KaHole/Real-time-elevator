@@ -12,59 +12,67 @@ start(DriverPid, {Elevator, HallCalls}) ->
 state_server(DriverPid, Elevator, HallCalls) ->
     
     receive
-        {polled_state_update, {#elevator{floor=Floor, cabCalls=CabCalls}, IncomingHallCalls}} ->
+        {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
+        after 0 -> receive
+            {polled_state_update, {#elevator{floor=Floor, cabCalls=CabCalls}, IncomingHallCalls}} ->
 
-            _CabCalls = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
+                _CabCalls = [A or B || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
+                {_Floor, _BetweenFloors} = case Floor of
+                    between_floors -> {Elevator#elevator.floor, true};
+                    _ -> {Floor, false}
+                end,
 
-            {_Floor, _BetweenFloors} = case Floor of
-                between_floors -> {Elevator#elevator.floor, true};
-                _ -> {Floor, false}
-            end,
+                _Elevator = Elevator#elevator{floor=_Floor, cabCalls=_CabCalls, betweenFloors=_BetweenFloors},
 
-            _Elevator = Elevator#elevator{floor=_Floor, cabCalls=_CabCalls, betweenFloors=_BetweenFloors},
+                % Detect changes, send to coordinator if anything to report
+                HasIncomingHallCalls = lists:any(fun(E) -> E end, lists:flatten(IncomingHallCalls)),
+                if
+                    (Elevator#elevator.cabCalls =/= _CabCalls)
+                    or (Elevator#elevator.floor =/= _Floor)
+                    or HasIncomingHallCalls ->
+                        % TODO: REFACTOR THE SHIT OUT OF THIS UNDER
+                        Tmp = if 
+                            (_Elevator#elevator.direction == down) and (_Elevator#elevator.floor == 0) -> stop;
+                            (_Elevator#elevator.direction == up) and (_Elevator#elevator.floor == 3) -> stop;
+                            true -> _Elevator#elevator.direction
+                        end,
+                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=Tmp}, IncomingHallCalls};
+                        %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
+                    true -> ok
+                end,
 
-            % Detect changes, send to coordinator if anything to report
-            HasIncomingHallCalls = lists:any(fun(E) -> E end, lists:flatten(IncomingHallCalls)),
-            if
-                (Elevator#elevator.cabCalls =/= _CabCalls)
-                or (Elevator#elevator.floor =/= _Floor)
-                or HasIncomingHallCalls ->
-                    coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls};
-                    %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
-                true -> ok
-            end,
+                state_server(DriverPid, _Elevator, HallCalls);
 
-            state_server(DriverPid, _Elevator, HallCalls);
+            {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabCalls=CabCalls}, ActedHallCalls}} ->
 
-        {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabCalls=CabCalls}, ActedHallCalls}} ->
+                % Detect done cab-calls
+                _CabCalls = [if B == done -> false; true -> A end || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
 
-            % Detect done cab-calls
-            _CabCalls = [if B == done -> false; true -> A end || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
+                _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
-            _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
+                % TODO: do we need this?   -  Set done HallCalls to false
+                _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
 
-            % TODO: do we need this?   -  Set done HallCalls to false
-            _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
+                HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
 
-            HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
+                if
+                    (Elevator#elevator.cabCalls =/= _CabCalls)
+                    or (Elevator#elevator.behaviour =/= Behaviour)
+                    or (Elevator#elevator.direction =/= Direction)
+                    or HasDoneHallCalls ->
+                        coordinator ! {local_elevator_update, _Elevator, ActedHallCalls};
+                        %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
+                    true -> ok
+                end,
 
-            if
-                (Elevator#elevator.cabCalls =/= _CabCalls)
-                or (Elevator#elevator.behaviour =/= Behaviour)
-                or (Elevator#elevator.direction =/= Direction)
-                or HasDoneHallCalls ->
-                    coordinator ! {local_elevator_update, _Elevator, ActedHallCalls};
-                    %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
-                true -> ok
-            end,
+                state_server(DriverPid, _Elevator, _HallCalls);
 
-            state_server(DriverPid, _Elevator, _HallCalls);
+            {set_hall_calls, _HallCalls} -> state_server(DriverPid, Elevator, _HallCalls);
 
-        {set_hall_calls, _HallCalls} -> state_server(DriverPid, Elevator, _HallCalls);
+            {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}};
 
-        {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}};
-
-        {set_hall_order_button_lights, HallRequests} -> set_hall_button_lights(DriverPid, HallRequests)
+            {set_hall_order_button_lights, HallRequests} -> set_hall_button_lights(DriverPid, HallRequests)
+        end
     end,
 
     state_server(DriverPid, Elevator, HallCalls).

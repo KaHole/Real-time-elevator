@@ -16,6 +16,8 @@ assign({Elevators, HallRequests}) ->
 
     JsonState = io_lib:format("'{\"hallRequests\": ~s, \"states\": {~s}}'", [hall_requests_to_json(HallRequests), ElevatorJson]),
 
+    io:format("~s~n", [" " ++ JsonState]),
+
     Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner -i " ++ JsonState))),
     maps:get(list_to_binary(atom_to_list(node())), Data).
 
