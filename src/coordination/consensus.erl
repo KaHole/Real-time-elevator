@@ -20,7 +20,7 @@ merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallReques
 % Ny node kommer inn, må bli med?
 % TODO: nothing -> accepted ???????
 
-% DENNE ER FARLIG???
+% DENNE ER FARLIG!!
 % Men uten denne så vil ny node stucke de andre i done til nothing consensus
 % TODO: nothing -> done ???????
 
@@ -30,30 +30,24 @@ merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequ
 
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
+merge_requests(#hallRequest{state=State, observedBy=ObservedBy1} = HallRequest1,
+               #hallRequest{state=State, observedBy=ObservedBy2}) ->
+    
+    ObsBySet1 = sets:from_list(ObservedBy1),
+    ObsBySet2 = sets:from_list(ObservedBy2),
+    _ObservedBy = sets:to_list(sets:union(ObsBySet1, ObsBySet2)),
+    HallRequest1#hallRequest{observedBy=_ObservedBy};
 
-merge_requests(#hallRequest{state=State1, observedBy=ObservedBy1} = HallRequest1,
-               #hallRequest{state=State2, observedBy=ObservedBy2}) ->
+merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, _) ->
 
-    % TODO: Likhetsjekker kan gjøres i arg-listen, dersom args har samme navn! State,   State.. kult
-
-    _ObservedBy = if
-        State1 =:= State2 ->
-            ObsBySet1 = sets:from_list(ObservedBy1),
-            ObsBySet2 = sets:from_list(ObservedBy2),
-            sets:to_list(sets:union(ObsBySet1, ObsBySet2));
-        true -> ObservedBy1
-    end,
-    HallRequest1#hallRequest{observedBy=_ObservedBy}.
-
+    HallRequest1#hallRequest{observedBy=ObservedBy1}.
 
 consense_floor({HallUp, HallDown}) ->
     {consense_request(HallUp), consense_request(HallDown)}.
 
 consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
 
-%TODO: Tror bare den trenger dette:
 consense_request(#hallRequest{state=accepted} = HallRequest) -> HallRequest;
-%consense_request(#hallRequest{state=accepted, observedBy=ObservedBy}) ->
 
 consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 

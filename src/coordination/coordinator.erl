@@ -26,17 +26,8 @@ observe(Elevators, HallRequests) ->
                 state_poller ! {set_hall_order_button_lights, _HallRequests},
 
                 % Get only the states of the hall-requests for comparison (change detection)
-                HallRequestStates = lists:map(
-                    fun({HallUp, HallDown}) ->
-                        {HallUp#hallRequest.state, HallDown#hallRequest.state}
-                    end
-                , HallRequests),
-
-                _HallRequestStates = lists:map(
-                    fun({HallUp, HallDown}) ->
-                        {HallUp#hallRequest.state, HallDown#hallRequest.state}
-                    end
-                , _HallRequests),
+                HallRequestStates = map_hall_request_state(HallRequests),
+                _HallRequestStates = map_hall_request_state(_HallRequests),
 
                 if
                     _HallRequestStates =/= HallRequestStates ->
@@ -46,8 +37,7 @@ observe(Elevators, HallRequests) ->
                     true -> ok
                 end,
 
-                %TODO: If no hall-requests, this should return imeadietly with an [[false, false], .... ]
-                AssignedHallCalls = hall_request_assigner:assign({_Elevators, _HallRequests}),
+                AssignedHallCalls = hall_request_assigner:assign(_Elevators, _HallRequestStates),
 
                 % Sends assigned hall-requests to elevator logic
                 state_poller ! {set_hall_calls, AssignedHallCalls}
@@ -85,6 +75,12 @@ update_hall_requests(HallRequests, HallCalls) ->
 generate_hall_request(done) -> #hallRequest{state=done, observedBy=[node()]};
 generate_hall_request(true) -> #hallRequest{state=new, observedBy=[node()]};
 generate_hall_request(false) -> #hallRequest{}.
+
+map_hall_request_state(HallRequests) ->
+    lists:map(
+        fun({HallUp, HallDown}) ->
+            {HallUp#hallRequest.state, HallDown#hallRequest.state}
+        end, HallRequests).
 
 broadcast_state(Elevator, HallRequests) ->
     [{coordinator, N} ! {elevator_update, node(), Elevator, HallRequests} || N <- nodes()].

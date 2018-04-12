@@ -11,6 +11,7 @@ start(DriverPid, {Elevator, HallCalls}) ->
 
 state_server(DriverPid, Elevator, HallCalls) ->
     
+    % TODO: this priority doesnt seem right
     receive
         {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
         after 0 -> receive

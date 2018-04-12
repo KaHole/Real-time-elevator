@@ -23,7 +23,7 @@ init(Pid, _) ->
 
 elevator_controller(Pid) -> 
     % io:fwrite("ele_ctrl~n"),
-    % TODO: needs testing of different rates
+    % TODO: needs testing of different rates, CAN PROBABLY GO LOWER ??
     %timer:sleep(250),
     timer:sleep(125),
     state_poller ! {get_state, self()},
