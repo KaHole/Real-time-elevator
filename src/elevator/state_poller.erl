@@ -2,7 +2,7 @@
 -include("../../include/worldstate.hrl").
 -export([start/2]).
 
--define(POLL_RATE, 125).
+-define(POLL_RATE, 10).
 
 start(DriverPid, {Elevator, HallCalls}) ->
     register(state_poller, spawn(fun() -> state_server(Elevator, HallCalls) end)),

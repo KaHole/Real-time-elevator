@@ -107,9 +107,9 @@ elevator_algorithm(State, CabHallCall) ->
 
 check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
-    %case elevator_interface:get_floor_sensor_state(Pid) of
-    %    between_floors -> {State, HallCalls};
-    %    _ ->
+    case elevator_interface:get_floor_sensor_state(Pid) of
+        between_floors -> {State, HallCalls};
+        _ ->
             CabStop = lists:nth(
                 State#elevator.floor+1,
                 State#elevator.cabCalls
@@ -171,8 +171,8 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
             % Note cab-stop blocks so should be after message
             % TODO: remove return value, if we keep the send statement in here
-            {_State, _HallCalls}.
-    %end.
+            {_State, _HallCalls}
+    end.
 
 stop_at_floor(Pid, State, HallCalls) ->
     elevator_interface:set_motor_direction(Pid, stop),
