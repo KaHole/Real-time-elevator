@@ -17,9 +17,11 @@ observe(Elevators, HallRequests) ->
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
-                io:fwrite("foreign elevator ~n"),
+                %io:fwrite("foreign elevator ~n"),
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
+
+                %io:format("~p~n", [ExternalHallRequests]),
 
                 % Send hall-requests to turn on/off the order lights
                 state_poller ! {set_hall_order_button_lights, _HallRequests},
@@ -27,6 +29,7 @@ observe(Elevators, HallRequests) ->
                 if
                     _HallRequests =/= HallRequests ->
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
+                        io:format("~p~n", [_HallRequests]),
                         broadcast_state(LocalElevator, _HallRequests);
                     true -> ok
                 end,
