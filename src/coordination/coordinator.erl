@@ -9,12 +9,10 @@ observe(Elevators, HallRequests) ->
 
     receive
         {local_elevator_update, Elevator, HallCalls} ->
-
             {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls)
 
         after 0 -> receive
             {local_elevator_update, Elevator, HallCalls} ->
-
                 {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls);
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
@@ -37,6 +35,8 @@ observe(Elevators, HallRequests) ->
                 state_poller ! {set_hall_calls, AssignedHallCalls}
         end
     end,
+
+    state_poller ! {set_hall_order_button_lights, _HallRequests},
 
     observe(_Elevators, _HallRequests).
 

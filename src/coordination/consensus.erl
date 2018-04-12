@@ -31,6 +31,7 @@ merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequ
 
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
+
 merge_requests(#hallRequest{state=State1, observedBy=ObservedBy1} = HallRequest1,
                #hallRequest{state=State2, observedBy=ObservedBy2}) ->
 

@@ -5,11 +5,11 @@
 -define(POLL_RATE, 10).
 
 start(DriverPid, {Elevator, HallCalls}) ->
-    register(state_poller, spawn(fun() -> state_server(Elevator, HallCalls) end)),
+    register(state_poller, spawn(fun() -> state_server(DriverPid, Elevator, HallCalls) end)),
     spawn(fun() -> poller(DriverPid, length(HallCalls)) end).
 
 
-state_server(Elevator, HallCalls) ->
+state_server(DriverPid, Elevator, HallCalls) ->
     
     receive
         {polled_state_update, {#elevator{floor=Floor, cabCalls=CabCalls}, IncomingHallCalls}} ->
@@ -34,7 +34,7 @@ state_server(Elevator, HallCalls) ->
                 true -> ok
             end,
 
-            state_server(_Elevator, HallCalls);
+            state_server(DriverPid, _Elevator, HallCalls);
 
         {driven_state_update, {#elevator{behaviour=Behaviour, direction=Direction, cabCalls=CabCalls}, ActedHallCalls}} ->
 
@@ -58,15 +58,18 @@ state_server(Elevator, HallCalls) ->
                 true -> ok
             end,
 
-            state_server(_Elevator, _HallCalls);
+            state_server(DriverPid, _Elevator, _HallCalls);
 
-        {set_hall_calls, _HallCalls} -> state_server(Elevator, _HallCalls);
+        {set_hall_calls, _HallCalls} -> state_server(DriverPid, Elevator, _HallCalls);
 
-        {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
+        {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}};
+
+        {set_hall_order_button_lights, HallRequests} -> set_hall_button_lights(DriverPid, HallRequests)
     end,
 
-    state_server(Elevator, HallCalls).
+    state_server(DriverPid, Elevator, HallCalls).
 
+% TODO: Nødvendig?
 disarm_hall_calls([], []) -> [];
 disarm_hall_calls([[HallUp, HallDown] | Tail], [[ActedHallUp, ActedHallDown] | ActedTail]) ->
     _HallUp = case ActedHallUp of
@@ -79,6 +82,24 @@ disarm_hall_calls([[HallUp, HallDown] | Tail], [[ActedHallUp, ActedHallDown] | A
     end,
     [[_HallUp, _HallDown] | disarm_hall_calls(Tail, ActedTail)].
 
+
+set_hall_button_lights(DriverPid, HallRequests) ->
+    set_hall_button_lights_internal(DriverPid, HallRequests, 0).
+
+set_hall_button_lights_internal(_, [], _) -> ok;
+
+set_hall_button_lights_internal(DriverPid, [{#hallRequest{state=HallUp}, #hallRequest{state=HallDown}}| Tail], N) ->
+    UpOn = if
+        HallUp -> on;
+        true -> off
+    end,
+    DownOn = if
+        HallDown -> on;
+        true -> off
+    end,
+    elevator_interface:set_order_button_light(DriverPid, hall_up, N, UpOn),
+    elevator_interface:set_order_button_light(DriverPid, hall_down, N, DownOn),
+    set_hall_button_lights_internal(DriverPid, Tail, N+1).
 
 poller(DriverPid, NumFloors) ->
 
