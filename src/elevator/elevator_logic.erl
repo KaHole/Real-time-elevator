@@ -31,6 +31,8 @@ elevator_controller(Pid) ->
     receive
         {updated_state, {State, HallCalls}} -> 
             elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
+
+            set_cab_button_lights(Pid, State#elevator.cabCalls),
             
             % Handle hall calls as cab calls temporarily for determining direction of elevator
             CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabCalls, HallCalls)],
@@ -50,6 +52,17 @@ elevator_controller(Pid) ->
 
     end,
     elevator_controller(Pid).
+
+
+set_cab_button_lights(Pid, CabCalls) ->
+    set_cab_button_lights(Pid, CabCalls, 0);
+
+set_cab_button_lights(_, [], _) -> ok.
+
+set_cab_button_lights(Pid, [CabCall | Tail], N) ->
+    elevator_interface:set_order_button_light(Pid, cab, N, CabCall),
+    set_cab_button_lights(Pid, Tail, N+1).
+
 
 elevator_algorithm(State, CabHallCall) ->
     {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, CabHallCall),
