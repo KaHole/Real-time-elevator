@@ -55,13 +55,13 @@ elevator_controller(Pid) ->
 
 
 set_cab_button_lights(Pid, CabCalls) ->
-    set_cab_button_lights(Pid, CabCalls, 0).
+    set_cab_button_lights_internal(Pid, CabCalls, 0).
 
-set_cab_button_lights(_, [], _) -> ok;
+set_cab_button_lights_internal(_, [], _) -> ok;
 
-set_cab_button_lights(Pid, [CabCall | Tail], N) ->
+set_cab_button_lights_internal(Pid, [CabCall | Tail], N) ->
     elevator_interface:set_order_button_light(Pid, cab, N, CabCall),
-    set_cab_button_lights(Pid, Tail, N+1).
+    set_cab_button_lights_internal(Pid, Tail, N+1).
 
 
 elevator_algorithm(State, CabHallCall) ->
