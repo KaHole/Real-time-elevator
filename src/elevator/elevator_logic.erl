@@ -55,9 +55,9 @@ elevator_controller(Pid) ->
 
 
 set_cab_button_lights(Pid, CabCalls) ->
-    set_cab_button_lights(Pid, CabCalls, 0);
+    set_cab_button_lights(Pid, CabCalls, 0).
 
-set_cab_button_lights(_, [], _) -> ok.
+set_cab_button_lights(_, [], _) -> ok;
 
 set_cab_button_lights(Pid, [CabCall | Tail], N) ->
     elevator_interface:set_order_button_light(Pid, cab, N, CabCall),
