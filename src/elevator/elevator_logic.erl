@@ -30,6 +30,8 @@ elevator_controller(Pid) ->
 
     receive
         {updated_state, {State, HallCalls}} -> 
+            elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
+            
             % Handle hall calls as cab calls temporarily for determining direction of elevator
             CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabCalls, HallCalls)],
             % Figure out which direction to go
@@ -45,9 +47,6 @@ elevator_controller(Pid) ->
                     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
                 _ -> elevator_interface:set_motor_direction(Pid, NewState#elevator.direction)
             end,
-            % elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
-            elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
-            %state_poller ! {driven_state_update, {NewState, _HallCalls}}
     end,
     elevator_controller(Pid).
 
