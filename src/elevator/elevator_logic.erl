@@ -107,68 +107,72 @@ elevator_algorithm(State, CabHallCall) ->
 
 check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
-    CabStop = lists:nth(
-        State#elevator.floor+1,
-        State#elevator.cabCalls
-    ),
-
-    [HallUp, HallDown] = lists:nth(
-        State#elevator.floor+1,
-        HallCalls
-    ),
-
-    Tmp1 = lists:any(fun(X) -> X end, headnth(State#elevator.floor+1, CabHallCall)),
-
-    HallUpStop = if
-        HallUp and (State#elevator.direction == up) -> true;
-        HallUp and (State#elevator.direction == down) and (not Tmp1) -> true;
-        true -> false
-    end,
-
-    Tmp2 = lists:any(fun(X) -> X end, lists:nthtail(State#elevator.floor+1, CabHallCall)),
-    HallDownStop = if
-        HallDown and (State#elevator.direction == down) -> true;
-        HallDown and (State#elevator.direction == up) and (not Tmp2) -> true;
-        true -> false
-    end, 
-
-    _State = if 
-        CabStop -> State#elevator{
-            cabCalls=setnth(
+    case elevator_interface:get_floor_sensor_state(Pid) of
+        between_floors -> {State, HallCalls};
+        _ ->
+            CabStop = lists:nth(
                 State#elevator.floor+1,
-                State#elevator.cabCalls,
-                done
-            )
-        };
-        true -> State
-    end,
+                State#elevator.cabCalls
+            ),
 
-    _HallCalls = if 
-        HallUpStop -> setnth(
-            State#elevator.floor+1,
-            HallCalls,
-            [done, HallDown]
-        );
-        HallDownStop -> setnth(
-            State#elevator.floor+1,
-            HallCalls,
-            [HallUp, done]
-        );
-        true -> HallCalls
-    end,
+            [HallUp, HallDown] = lists:nth(
+                State#elevator.floor+1,
+                HallCalls
+            ),
 
-    state_poller ! {driven_state_update, {_State, _HallCalls}},
+            Tmp1 = lists:any(fun(X) -> X end, headnth(State#elevator.floor+1, CabHallCall)),
 
-    if
-        CabStop or HallUpStop or HallDownStop ->
-            io:fwrite("Stopping! Opening doors~n"),
-            stop_at_floor(Pid, State, HallCalls);
-        true -> ok
-    end,
+            HallUpStop = if
+                HallUp and (State#elevator.direction == up) -> true;
+                HallUp and (State#elevator.direction == down) and (not Tmp1) -> true;
+                true -> false
+            end,
 
-    % Note cab-stop blocks so should be after message
-    % TODO: remove return value, if we keep the send statement in here
-    {_State, _HallCalls}.
+            Tmp2 = lists:any(fun(X) -> X end, lists:nthtail(State#elevator.floor+1, CabHallCall)),
+            HallDownStop = if
+                HallDown and (State#elevator.direction == down) -> true;
+                HallDown and (State#elevator.direction == up) and (not Tmp2) -> true;
+                true -> false
+            end, 
+
+            _State = if 
+                CabStop -> State#elevator{
+                    cabCalls=setnth(
+                        State#elevator.floor+1,
+                        State#elevator.cabCalls,
+                        done
+                    )
+                };
+                true -> State
+            end,
+
+            _HallCalls = if 
+                HallUpStop -> setnth(
+                    State#elevator.floor+1,
+                    HallCalls,
+                    [done, HallDown]
+                );
+                HallDownStop -> setnth(
+                    State#elevator.floor+1,
+                    HallCalls,
+                    [HallUp, done]
+                );
+                true -> HallCalls
+            end,
+
+            state_poller ! {driven_state_update, {_State, _HallCalls}},
+
+            if
+                CabStop or HallUpStop or HallDownStop ->
+                    io:fwrite("Stopping! Opening doors~n"),
+                    stop_at_floor(Pid, State, HallCalls);
+                true -> ok
+            end,
+
+            % Note cab-stop blocks so should be after message
+            % TODO: remove return value, if we keep the send statement in here
+            {_State, _HallCalls}
+    end.
 
 stop_at_floor(Pid, State, HallCalls) ->
     elevator_interface:set_motor_direction(Pid, stop),
