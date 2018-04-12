@@ -21,6 +21,8 @@ observe(Elevators, HallRequests) ->
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
+                state_poller ! {set_hall_order_button_lights, _HallRequests},
+
                 if
                     _HallRequests =/= HallRequests ->
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
@@ -36,8 +38,6 @@ observe(Elevators, HallRequests) ->
         end
     end,
 
-    state_poller ! {set_hall_order_button_lights, _HallRequests},
-
     observe(_Elevators, _HallRequests).
 
 handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
@@ -46,6 +46,8 @@ handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
     %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
+
+    state_poller ! {set_hall_order_button_lights, _HallRequests},
 
     broadcast_state(Elevator, _HallRequests),
     {_Elevators, _HallRequests}.
