@@ -21,6 +21,7 @@ observe(Elevators, HallRequests) ->
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
+                % Send hall-requests to turn on/off the order lights
                 state_poller ! {set_hall_order_button_lights, _HallRequests},
 
                 if
@@ -47,6 +48,7 @@ handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
 
     %TODO: Assign hall_requests and send to state_poller here????? PROBABLY NO POINT
 
+    % Send hall-requests to turn on/off the order lights
     state_poller ! {set_hall_order_button_lights, _HallRequests},
 
     broadcast_state(Elevator, _HallRequests),

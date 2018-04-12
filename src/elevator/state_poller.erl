@@ -91,11 +91,11 @@ set_hall_button_lights_internal(_, [], _) -> ok;
 set_hall_button_lights_internal(DriverPid, [{#hallRequest{state=HallUp}, #hallRequest{state=HallDown}}| Tail], N) ->
     UpOn = case HallUp of
         accepted -> on;
-        true -> off
+        _ -> off
     end,
     DownOn = case HallDown of
         accepted -> on;
-        true -> off
+        _ -> off
     end,
     elevator_interface:set_order_button_light(DriverPid, hall_up, N, UpOn),
     elevator_interface:set_order_button_light(DriverPid, hall_down, N, DownOn),
