@@ -87,11 +87,13 @@ elevator_algorithm(State, CabHallCall) ->
         if
             Go_up ->
                 State#elevator{
+                    behaviour=moving,
                     direction=up
                 }
             ;
             Go_down ->
                 State#elevator{
+                    behaviour=moving,
                     direction=down
                 }
             ;
@@ -159,22 +161,28 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         true -> HallCalls
     end,
 
-    state_poller ! {driven_state_update, {_State, _HallCalls}},
-
     if
-        CabStop or HallUpStop or HallDownStop ->
-            io:fwrite("Stopping! Opening doors~n"),
-            stop_at_floor(Pid, State, HallCalls);
-        true -> ok
-    end.
+        CabStop or HallUpStop or HallDownStop -> 
+            state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen}, _HallCalls}},
+            stop_at_floor(Pid, State#elevator.floor);
+        true -> state_poller ! {driven_state_update, {_State, _HallCalls}}
+    end. 
+    % state_poller ! {driven_state_update, {_State, _HallCalls}},
 
-stop_at_floor(Pid, State, HallCalls) ->
+    % if
+    %     CabStop or HallUpStop or HallDownStop ->
+    %         io:fwrite("Stopping! Opening doors~n"),
+    %         stop_at_floor(Pid, State#elevator.floor);
+    %     true -> ok
+    % end.
+
+stop_at_floor(Pid, Floor) ->
     elevator_interface:set_motor_direction(Pid, stop),
-    elevator_interface:set_order_button_light(Pid, cab, State#elevator.floor, off),
+    elevator_interface:set_order_button_light(Pid, cab, Floor, off),
     elevator_interface:set_door_open_light(Pid, on),
     timer:sleep(2000),  % Remain open for 2 sec. Alt. move to case beneath.
     case elevator_interface:get_obstruction_switch_state(Pid) of
-        1 -> stop_at_floor(Pid, State, HallCalls);
+        1 -> stop_at_floor(Pid, Floor);
         _ -> ok
     end,
     elevator_interface:set_door_open_light(Pid, off). % Close within 5 seconds?
