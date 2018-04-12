@@ -17,7 +17,7 @@ observe(Elevators, HallRequests) ->
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
-                % io:fwrite("foreign elevator ~n"),
+                io:fwrite("foreign elevator ~n"),
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
@@ -42,7 +42,7 @@ observe(Elevators, HallRequests) ->
     observe(_Elevators, _HallRequests).
 
 handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
-    %io:fwrite("local elevator ~n"),
+    io:fwrite("local elevator ~n"),
     _Elevators = update_elevator(Elevators, node(), Elevator),
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
