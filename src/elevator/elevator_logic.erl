@@ -42,7 +42,7 @@ elevator_controller(Pid) ->
             % If the hallrequest gets reassigned while elevator is in motion
             case NewState#elevator.direction of
                 stop ->
-                    init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)})
+                    init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
                 _ -> elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
             % elevator_interface:set_motor_direction(Pid, NewState#elevator.direction),
             elevator_interface:set_floor_indicator(Pid, NewState#elevator.floor)
