@@ -26,6 +26,7 @@ observe(Elevators, HallRequests) ->
                 % Send hall-requests to turn on/off the order lights
                 state_poller ! {set_hall_order_button_lights, _HallRequests},
 
+                % Get only the states of the hall-requests for comparison (change detection)
                 HallRequestStates = lists:map(
                     fun({HallUp, HallDown}) ->
                         {HallUp#hallRequest.state, HallDown#hallRequest.state}
