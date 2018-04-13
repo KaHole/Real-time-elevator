@@ -31,9 +31,10 @@ observe(Elevators, HallRequests) ->
                 HallRequestStates = map_hall_request_state(HallRequests),
                 _HallRequestStates = map_hall_request_state(_HallRequests),
 
-                % TODO: Is this enough redundancy??
+                % TODO: Is this enough redundancy?? The other one leads to the issue of getting an order again immeadiatly because the consenus is so fast, THIS CAN BE FIXED!
                 if
                     _HallRequestStates =/= HallRequestStates ->
+                    %_HallRequests =/= HallRequests ->
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
                         % io:format("~p~n", [_HallRequestStates]),
                         broadcast_state(LocalElevator, _HallRequests);

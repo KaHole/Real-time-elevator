@@ -26,11 +26,10 @@ merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequ
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
 % DENNE ER FARLIG!!
-% Men uten denne så vil ny node stucke de andre i done til nothing consensus
 % TODO: nothing -> done ???????
 % Er denne ok da?
 % ENESTE SOM ER SIKKERT ER AT BEGGE DISSE, den over og den under, KAN VÆRE TILSTEDE SAMTIDIG!!
-% merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
+%merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
 
 % Merge requests with same state by adding the observers together
 merge_requests(#hallRequest{state=State, observedBy=ObservedBy1} = HallRequest1,
@@ -47,8 +46,11 @@ consense_floor({HallUp, HallDown}) ->
     {consense_request(HallUp), consense_request(HallDown)}.
 
 consense_request(#hallRequest{state=nothing} = HallRequest) -> HallRequest;
-
+% TODO disse kan være en åpen på bunnen heller da,
 consense_request(#hallRequest{state=accepted} = HallRequest) -> HallRequest;
+
+%consense_request(#hallRequest{state=done, observedBy=ObservedBy}) ->
+
 
 consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
