@@ -13,7 +13,7 @@ start(Pid) ->
 
 init(Pid, #elevator{floor=between_floors}) ->
     elevator_interface:set_motor_direction(Pid, up),
-    timer:sleep(500),
+    timer:sleep(10),
     Floor = elevator_interface:get_floor_sensor_state(Pid),
     init(Pid, #elevator{floor=Floor});
 
