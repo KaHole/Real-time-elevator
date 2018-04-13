@@ -11,7 +11,7 @@ start(DriverPid, {Elevator, HallCalls}) ->
 
 state_server(DriverPid, Elevator, HallCalls) ->
     
-    % TODO: this priority doesnt seem right
+    % TODO: is this priority right? it is important that the elevator gets to run of course ..
     receive
         {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
         after 0 -> receive
@@ -58,7 +58,7 @@ state_server(DriverPid, Elevator, HallCalls) ->
 
                 _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
-                % TODO: do we need this?   -  Set done HallCalls to false
+                % Set done HallCalls to false locally aswell
                 _HallCalls = disarm_hall_calls(HallCalls, ActedHallCalls),
 
                 HasDoneHallCalls = lists:any(fun(E) -> E == done end, lists:flatten(ActedHallCalls)),
@@ -85,7 +85,6 @@ state_server(DriverPid, Elevator, HallCalls) ->
 
     state_server(DriverPid, Elevator, HallCalls).
 
-% TODO: Nødvendig?
 disarm_hall_calls([], []) -> [];
 disarm_hall_calls([[HallUp, HallDown] | Tail], [[ActedHallUp, ActedHallDown] | ActedTail]) ->
     _HallUp = case ActedHallUp of

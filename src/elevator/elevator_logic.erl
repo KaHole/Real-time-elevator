@@ -5,33 +5,31 @@
 
 start(Pid) ->
     io:fwrite("~p~n", [Pid]),
-    init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
+    seek_nearest_floor(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
 
     register(elevator_controller, 
         spawn(fun() -> elevator_controller(Pid) end)
     ).
 
-init(Pid, #elevator{floor=between_floors}) ->
+seek_nearest_floor(Pid, #elevator{floor=between_floors}) ->
     elevator_interface:set_motor_direction(Pid, up),
     timer:sleep(10),
     Floor = elevator_interface:get_floor_sensor_state(Pid),
-    init(Pid, #elevator{floor=Floor});
+    seek_nearest_floor(Pid, #elevator{floor=Floor});
 
-init(Pid, _) -> 
+seek_nearest_floor(Pid, _) -> 
     elevator_interface:set_motor_direction(Pid, stop).
-
 
 elevator_controller(Pid) -> 
     % io:fwrite("ele_ctrl~n"),
     % TODO: needs testing of different rates, CAN PROBABLY GO LOWER ??
     %timer:sleep(250),
-    timer:sleep(125),
+    %timer:sleep(125),
+    timer:sleep(50),
     state_poller ! {get_state, self()},
 
     receive
         {updated_state, {State, HallCalls}} -> 
-            % elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
-            
             % Handle hall calls as cab calls temporarily for determining direction of elevator
             CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabCalls, HallCalls)],
             % Figure out which direction to go
@@ -41,7 +39,7 @@ elevator_controller(Pid) ->
             % If the hallrequest gets reassigned while elevator is in motion and in between 2 floors
             case _State#elevator.direction of
                 stop ->
-                    init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
+                    seek_nearest_floor(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
                 _ -> elevator_interface:set_motor_direction(Pid, _State#elevator.direction)
             end,
 

@@ -19,16 +19,20 @@ merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallReques
 
 merge_requests(#hallRequest{state=nothing}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
-% DENNE ER FARLIG!!
-% Men uten denne så vil ny node stucke de andre i done til nothing consensus
-% TODO: nothing -> done ???????
-
 merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
 merge_requests(#hallRequest{state=accepted}, #hallRequest{state=done} = HallRequest2) -> HallRequest2;
 
 merge_requests(#hallRequest{state=accepted} = HallRequest1, #hallRequest{state=accepted}) -> HallRequest1;
 
+% DENNE ER FARLIG!!
+% Men uten denne så vil ny node stucke de andre i done til nothing consensus
+% TODO: nothing -> done ???????
+% Er denne ok da?
+% ENESTE SOM ER SIKKERT ER AT BEGGE DISSE, den over og den under, KAN VÆRE TILSTEDE SAMTIDIG!!
+% merge_requests(#hallRequest{state=done}, #hallRequest{state=nothing} = HallRequest2) -> HallRequest2;
+
+% Merge requests with same state by adding the observers together
 merge_requests(#hallRequest{state=State, observedBy=ObservedBy1} = HallRequest1,
                #hallRequest{state=State, observedBy=ObservedBy2}) ->
     
@@ -37,9 +41,7 @@ merge_requests(#hallRequest{state=State, observedBy=ObservedBy1} = HallRequest1,
     _ObservedBy = sets:to_list(sets:union(ObsBySet1, ObsBySet2)),
     HallRequest1#hallRequest{observedBy=_ObservedBy};
 
-merge_requests(#hallRequest{observedBy=ObservedBy1} = HallRequest1, _) ->
-
-    HallRequest1#hallRequest{observedBy=ObservedBy1}.
+merge_requests(HallRequest1, _) -> HallRequest1.
 
 consense_floor({HallUp, HallDown}) ->
     {consense_request(HallUp), consense_request(HallDown)}.
