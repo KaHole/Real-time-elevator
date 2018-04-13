@@ -27,7 +27,8 @@ Release
 
 Notes on generating binary:
 
-- IP-er må settes osv
+- Erlang cookie må settes i release
+- IP-er må settes
 - A release on linux will run on linux (no cross-platform releases)
 - No config files allowed, ikke noe problem egentlig, det bruker vi kun til testing
 - `include_erts` gjør at erlang ikke trenger å være installert, og sikrer riktig kjøring uansett versjon på maskinen

@@ -27,7 +27,7 @@ start(_StartType, _StartArgs) ->
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
     elevator_logic:start(DriverPid),
 
-    %TODO: fjern og slett den filen? eller skal vi bruke det til noe?
+    %TODO: fjern og slett den filen? eller skal vi bruke denne til monitoring/fault tolerance?
     elevator_sup:start_link().
 
 stop(_State) ->

@@ -36,14 +36,7 @@ state_server(DriverPid, Elevator, HallCalls) ->
                         elevator_interface:set_floor_indicator(DriverPid, _Floor),
                         set_cab_button_lights(DriverPid, _CabCalls),
 
-                        % TODO: REFACTOR THE SHIT OUT OF THIS UNDER
-                        Tmp = if 
-                            (_Elevator#elevator.direction == down) and (_Elevator#elevator.floor == 0) -> stop;
-                            (_Elevator#elevator.direction == up) and (_Elevator#elevator.floor == 3) -> stop;
-                            true -> _Elevator#elevator.direction
-                        end,
-                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=Tmp}, IncomingHallCalls};
-                        %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
+                        coordinator ! {local_elevator_update, _Elevator, IncomingHallCalls};
                     true -> ok
                 end,
 
@@ -68,7 +61,15 @@ state_server(DriverPid, Elevator, HallCalls) ->
                     or (Elevator#elevator.behaviour =/= Behaviour)
                     or (Elevator#elevator.direction =/= Direction)
                     or HasDoneHallCalls ->
-                        coordinator ! {local_elevator_update, _Elevator, ActedHallCalls};
+
+                        % TODO: REFACTOR THE SHIT OUT OF THIS UNDER
+                        Tmp = if 
+                            (_Elevator#elevator.direction == down) and (_Elevator#elevator.floor == 0) -> stop;
+                            (_Elevator#elevator.direction == up) and (_Elevator#elevator.floor == 3) -> stop;
+                            true -> _Elevator#elevator.direction
+                        end,
+
+                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=Tmp}, ActedHallCalls};
                         %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
                     true -> ok
                 end,
