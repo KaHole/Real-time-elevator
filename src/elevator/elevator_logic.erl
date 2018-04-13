@@ -4,7 +4,6 @@
 -export([start/1]).
 
 start(Pid) ->
-    io:fwrite("~p~n", [Pid]),
     seek_nearest_floor(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
 
     register(elevator_controller, 
@@ -13,7 +12,7 @@ start(Pid) ->
 
 seek_nearest_floor(Pid, #elevator{floor=between_floors}) ->
     elevator_interface:set_motor_direction(Pid, up),
-    timer:sleep(100),
+    timer:sleep(180),
     Floor = elevator_interface:get_floor_sensor_state(Pid),
     seek_nearest_floor(Pid, #elevator{floor=Floor});
 
@@ -22,7 +21,7 @@ seek_nearest_floor(Pid, _) ->
 
 elevator_controller(Pid) -> 
     % io:fwrite("ele_ctrl~n"),
-    % TODO: needs testing of different rates, CAN PROBABLY GO LOWER ??
+    % TODO: needs testing of different rates? Seems pretty good now
     %timer:sleep(250),
     %timer:sleep(125),
     timer:sleep(50),

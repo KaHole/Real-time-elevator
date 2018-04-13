@@ -32,9 +32,7 @@ observe(Elevators, HallRequests) ->
                 HallRequestStates = map_hall_request_state(HallRequests),
                 _HallRequestStates = map_hall_request_state(_HallRequests),
 
-                
-
-                % TODO: Is this enough redundancy?? The other one leads to the issue of getting an order again immeadiatly because the consenus is so fast, THIS CAN BE FIXED!
+                % TODO: Is this enough redundancy??
                 if
                     _HallRequestStates =/= HallRequestStates ->
                     %_HallRequests =/= HallRequests ->
@@ -61,7 +59,6 @@ handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
     _Elevators = update_elevator(Elevators, node(), Elevator),
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
-    %TODO: If 1 ELEVATOR IS RUN; we could consense her isntead of doing messaging, but its a simple solution, so if it works ...
     % If the elevator is alone, invoke consensus with self by sending a foreign elevator update to itself.
     Nodes = nodes(),
     if length(Nodes) == 0 -> coordinator ! {elevator_update, node(), Elevator, _HallRequests}; true -> ok end,
