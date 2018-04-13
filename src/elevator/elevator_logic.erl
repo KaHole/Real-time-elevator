@@ -50,25 +50,25 @@ elevator_controller(Pid) ->
     elevator_controller(Pid).
 
 elevator_algorithm(State, CabHallCall) ->
-    {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, CabHallCall),
+    {CabRequestDown, CabRequestUp} = lists:split(State#elevator.floor+1, CabHallCall),
 
-    Go_up = lists:any(fun(X) -> X end, 
-        [lists:nth(State#elevator.floor+1, CabHallCall)] ++ Cab_request_up
+    GoUp = lists:any(fun(X) -> X end, 
+        [lists:nth(State#elevator.floor+1, CabHallCall)] ++ CabRequestUp
     ),
 
-    Go_down = lists:any(fun(X) -> X end, Cab_request_down),
+    GoDown = lists:any(fun(X) -> X end, CabRequestDown),
     Continue = case State#elevator.direction of
-        up -> Go_up;
-        down -> Go_down;
+        up -> GoUp;
+        down -> GoDown;
         stop -> false
     end,
 
     case Continue of 
         false -> 
         if
-            Go_up ->
+            GoUp ->
                 State#elevator{behaviour=moving, direction=up};
-            Go_down ->
+            GoDown ->
                 State#elevator{behaviour=moving, direction=down};
             true -> 
                 State#elevator{
@@ -94,18 +94,17 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         HallCalls
     ),
 
-    Tmp1 = lists:any(fun(X) -> X end, headnth(State#elevator.floor+1, CabHallCall)),
-
+    RequestDown = lists:any(fun(X) -> X end, headnth(State#elevator.floor+1, CabHallCall)),
     HallUpStop = if
         HallUp and (State#elevator.direction == up) -> true;
-        HallUp and (State#elevator.direction == down) and (not Tmp1) -> true;
+        HallUp and (State#elevator.direction == down) and (not RequestDown) -> true;
         true -> false
     end,
 
-    Tmp2 = lists:any(fun(X) -> X end, lists:nthtail(State#elevator.floor+1, CabHallCall)),
+    RequestUp = lists:any(fun(X) -> X end, lists:nthtail(State#elevator.floor+1, CabHallCall)),
     HallDownStop = if
         HallDown and (State#elevator.direction == down) -> true;
-        HallDown and (State#elevator.direction == up) and (not Tmp2) -> true;
+        HallDown and (State#elevator.direction == up) and (not RequestUp) -> true;
         true -> false
     end, 
 
@@ -134,14 +133,6 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
             stop_at_floor(Pid, State#elevator.floor);
         true -> state_poller ! {driven_state_update, {_State, _HallCalls}}
     end. 
-    % state_poller ! {driven_state_update, {_State, _HallCalls}},
-
-    % if
-    %     CabStop or HallUpStop or HallDownStop ->
-    %         io:fwrite("Stopping! Opening doors~n"),
-    %         stop_at_floor(Pid, State#elevator.floor);
-    %     true -> ok
-    % end.
 
 stop_at_floor(Pid, Floor) ->
     elevator_interface:set_motor_direction(Pid, stop),
