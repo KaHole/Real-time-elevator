@@ -8,8 +8,11 @@
 
 start(_StartType, _StartArgs) ->
 
-    % -define(COOKIE, "bananpose_999").
-    % erlang:set_cookie(self(), ?COOKIE),
+    % TODO:
+    % Viktig info for release:
+    % relx gir appen short-name (node navn) by default "dev_elevator@datamaskin"
+    % Den setter også en cookie by default; samme verdi "dev_elevator"
+    % Disse kan selvsagt settes i relx config / vim.config som pekes på, men er gode defaults egentlig.
 
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
