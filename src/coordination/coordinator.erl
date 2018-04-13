@@ -31,13 +31,18 @@ observe(Elevators, HallRequests) ->
                 HallRequestStates = map_hall_request_state(HallRequests),
                 _HallRequestStates = map_hall_request_state(_HallRequests),
 
+                
+
                 % TODO: Is this enough redundancy?? The other one leads to the issue of getting an order again immeadiatly because the consenus is so fast, THIS CAN BE FIXED!
                 if
                     _HallRequestStates =/= HallRequestStates ->
                     %_HallRequests =/= HallRequests ->
+
+                        RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
+
                         {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
                         % io:format("~p~n", [_HallRequestStates]),
-                        broadcast_state(LocalElevator, _HallRequests);
+                        broadcast_state(LocalElevator, RedundantDoneHallRequests);
                     true -> ok
                 end,
 
@@ -88,6 +93,31 @@ map_hall_request_state(HallRequests) ->
         fun({HallUp, HallDown}) ->
             {HallUp#hallRequest.state, HallDown#hallRequest.state}
         end, HallRequests).
+
+detect_done_advancements([], []) -> [];
+
+% TODO: Add comments explaining
+detect_done_advancements([{#hallRequest{state=accepted} = HallUp, _} | Tail], [{#hallRequest{state=nothing}, NewHallDown} | NewTail]) ->
+    [{HallUp#hallRequest{state=done, observedBy = HallUp#hallRequest.observedBy ++ nodes()},
+    NewHallDown}] ++ detect_done_advancements(Tail, NewTail);
+
+detect_done_advancements([{#hallRequest{state=done} = HallUp, _} | Tail], [{#hallRequest{state=nothing}, NewHallDown} | NewTail]) ->
+    [{HallUp#hallRequest{observedBy = HallUp#hallRequest.observedBy ++ nodes()},
+    NewHallDown}] ++ detect_done_advancements(Tail, NewTail);
+
+detect_done_advancements([{_, #hallRequest{state=accepted} = HallDown} | Tail], [{NewHallUp, #hallRequest{state=nothing}} | NewTail]) ->
+    [{NewHallUp,
+    HallDown#hallRequest{state=done, observedBy = HallDown#hallRequest.observedBy ++ nodes()} }]
+    ++ detect_done_advancements(Tail, NewTail);
+
+detect_done_advancements([{_, #hallRequest{state=done} = HallDown} | Tail], [{NewHallUp, #hallRequest{state=nothing}} | NewTail]) ->
+    [{NewHallUp,
+    HallDown#hallRequest{observedBy = HallDown#hallRequest.observedBy ++ nodes()} }]
+    ++ detect_done_advancements(Tail, NewTail);
+
+detect_done_advancements([_ | Tail], [NewHallRequest | NewTail]) ->
+    [NewHallRequest] ++ detect_done_advancements(Tail, NewTail).
+
 
 broadcast_state(Elevator, HallRequests) ->
     [{coordinator, N} ! {elevator_update, node(), Elevator, HallRequests} || N <- nodes()].
