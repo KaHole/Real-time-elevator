@@ -1,4 +1,6 @@
-[{<<"jsone">>,
-  {git,"https://github.com/sile/jsone.git",
-       {ref,"0e42866709d54d462c52d252b75f5f481ba0b155"}},
-  0}].
+{"1.1.0",
+[{<<"jsone">>,{pkg,<<"jsone">>,<<"1.4.5">>},0}]}.
+[
+{pkg_hash,[
+ {<<"jsone">>, <<"547AEFEC1C67FE3283F77BAC4DAF85F3F593002764F768FAAA423875A51A2320">>}]}
+].

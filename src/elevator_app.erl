@@ -17,17 +17,17 @@ start(_StartType, _StartArgs) ->
     % Release skal helst starte alt med en binary om mulig, uten config
 
     %TODO: Fjerne dette før release
-    {_, Port} = application:get_env(port),
+    %{_, Port} = application:get_env(port),
 
-    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
-    % {_, DriverPid} = elevator_interface:start(),
+    %{_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
+    {_, DriverPid} = elevator_interface:start(),
 
-    discover:start(),
+    % discover:start(),
     % Test for mac:
-    % {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
+    {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
+    {connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
+    {connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
+    {connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
     coordinator:start(WorldState),
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
     elevator_logic:start(DriverPid),
