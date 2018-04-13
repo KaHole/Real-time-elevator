@@ -16,6 +16,7 @@ observe(Elevators, HallRequests) ->
                 {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls);
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
+                timer:sleep(1),
 
                 %io:fwrite("foreign elevator ~n"),
                 _Elevators = update_elevator(Elevators, Id, Elevator),

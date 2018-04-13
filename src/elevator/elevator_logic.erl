@@ -13,7 +13,7 @@ start(Pid) ->
 
 seek_nearest_floor(Pid, #elevator{floor=between_floors}) ->
     elevator_interface:set_motor_direction(Pid, up),
-    timer:sleep(10),
+    timer:sleep(100),
     Floor = elevator_interface:get_floor_sensor_state(Pid),
     seek_nearest_floor(Pid, #elevator{floor=Floor});
 
@@ -129,7 +129,8 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
     if
         CabStop or HallUpStop or HallDownStop -> 
-            state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen,direction=stop}, _HallCalls}},
+            % state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen,direction=stop}, _HallCalls}},
+            state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen}, _HallCalls}},
             stop_at_floor(Pid, State#elevator.floor);
         true -> state_poller ! {driven_state_update, {_State, _HallCalls}}
     end. 

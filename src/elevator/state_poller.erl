@@ -2,7 +2,7 @@
 -include("../../include/worldstate.hrl").
 -export([start/2]).
 
--define(POLL_RATE, 10).
+-define(POLL_RATE, 180).
 
 start(DriverPid, {Elevator, HallCalls}) ->
     register(state_poller, spawn(fun() -> state_server(DriverPid, Elevator, HallCalls) end)),
@@ -36,13 +36,7 @@ state_server(DriverPid, Elevator, HallCalls) ->
                         elevator_interface:set_floor_indicator(DriverPid, _Floor),
                         set_cab_button_lights(DriverPid, _CabCalls),
 
-                        % TODO: REFACTOR THE SHIT OUT OF THIS UNDER
-                        Tmp = if 
-                            (_Elevator#elevator.direction == down) and (_Elevator#elevator.floor == 0) -> stop;
-                            (_Elevator#elevator.direction == up) and (_Elevator#elevator.floor == 3) -> stop;
-                            true -> _Elevator#elevator.direction
-                        end,
-                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=Tmp}, IncomingHallCalls};
+                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=get_valid_direction(_Elevator)}, IncomingHallCalls};
                         %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
                     true -> ok
                 end,
@@ -68,7 +62,7 @@ state_server(DriverPid, Elevator, HallCalls) ->
                     or (Elevator#elevator.behaviour =/= Behaviour)
                     or (Elevator#elevator.direction =/= Direction)
                     or HasDoneHallCalls ->
-                        coordinator ! {local_elevator_update, _Elevator, ActedHallCalls};
+                        coordinator ! {local_elevator_update, _Elevator#elevator{direction=get_valid_direction(_Elevator)}, ActedHallCalls};
                         %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
                     true -> ok
                 end,
@@ -97,6 +91,15 @@ disarm_hall_calls([[HallUp, HallDown] | Tail], [[ActedHallUp, ActedHallDown] | A
     end,
     [[_HallUp, _HallDown] | disarm_hall_calls(Tail, ActedTail)].
 
+get_valid_direction(#elevator{direction=down, floor=0}) ->
+    stop;
+get_valid_direction(#elevator{direction=up, floor=Floor, cabCalls=CabCalls}) ->
+    if 
+        Floor =:= length(CabCalls)-1 -> stop;
+        true -> up
+    end;
+get_valid_direction(Elevator) ->
+    Elevator#elevator.direction.
 
 set_hall_button_lights(DriverPid, HallRequests) ->
     set_hall_button_lights_internal(DriverPid, HallRequests, 0).
