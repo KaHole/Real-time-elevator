@@ -30,9 +30,7 @@ elevator_controller(Pid) ->
 
     receive
         {updated_state, {State, HallCalls}} -> 
-            elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
-
-            set_cab_button_lights(Pid, State#elevator.cabCalls),
+            % elevator_interface:set_floor_indicator(Pid, State#elevator.floor),
             
             % Handle hall calls as cab calls temporarily for determining direction of elevator
             CabHallCall = [ Cab or Up or Down || {Cab,[Up,Down]} <- lists:zip(State#elevator.cabCalls, HallCalls)],
@@ -40,7 +38,7 @@ elevator_controller(Pid) ->
             _State = elevator_algorithm(State, CabHallCall),
 
             % it ensures the elevator stops at a floor.
-            % If the hallrequest gets reassigned while elevator is in motion
+            % If the hallrequest gets reassigned while elevator is in motion and in between 2 floors
             case _State#elevator.direction of
                 stop ->
                     init(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)});
@@ -52,21 +50,6 @@ elevator_controller(Pid) ->
 
     end,
     elevator_controller(Pid).
-
-
-set_cab_button_lights(Pid, CabCalls) ->
-    set_cab_button_lights_internal(Pid, CabCalls, 0).
-
-set_cab_button_lights_internal(_, [], _) -> ok;
-
-set_cab_button_lights_internal(Pid, [CabCall | Tail], N) ->
-    LightOn = if
-        CabCall -> on;
-        true -> off
-    end,
-    elevator_interface:set_order_button_light(Pid, cab, N, LightOn),
-    set_cab_button_lights_internal(Pid, Tail, N+1).
-
 
 elevator_algorithm(State, CabHallCall) ->
     {Cab_request_down, Cab_request_up} = lists:split(State#elevator.floor+1, CabHallCall),
@@ -86,17 +69,9 @@ elevator_algorithm(State, CabHallCall) ->
         false -> 
         if
             Go_up ->
-                State#elevator{
-                    behaviour=moving,
-                    direction=up
-                }
-            ;
+                State#elevator{behaviour=moving, direction=up};
             Go_down ->
-                State#elevator{
-                    behaviour=moving,
-                    direction=down
-                }
-            ;
+                State#elevator{behaviour=moving, direction=down};
             true -> 
                 State#elevator{
                     behaviour=idle,
@@ -148,16 +123,10 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
     end,
 
     _HallCalls = if 
-        HallUpStop -> setnth(
-            State#elevator.floor+1,
-            HallCalls,
-            [done, HallDown]
-        );
-        HallDownStop -> setnth(
-            State#elevator.floor+1,
-            HallCalls,
-            [HallUp, done]
-        );
+        HallUpStop ->
+            setnth(State#elevator.floor+1, HallCalls, [done, HallDown]);
+        HallDownStop ->
+            setnth(State#elevator.floor+1, HallCalls, [HallUp, done]);
         true -> HallCalls
     end,
 

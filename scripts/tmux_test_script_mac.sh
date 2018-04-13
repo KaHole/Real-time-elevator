@@ -5,6 +5,7 @@ SESSION="test"
 
 cd "../"
 declare -a nodes=( one two three four )
+#declare -a nodes=( one two three )
 ENTER="C-m"
 
 port=15657

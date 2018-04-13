@@ -6,6 +6,7 @@ start({Elevators, HallRequests}) ->
     register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
 observe(Elevators, HallRequests) ->
+    % Give priority to local_elevator-updates
     receive
         {local_elevator_update, Elevator, HallCalls} ->
             {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls)

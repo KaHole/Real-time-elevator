@@ -19,6 +19,7 @@ merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallReques
 
 % Ny node kommer inn, må bli med?
 % TODO: nothing -> accepted ???????
+merge_requests(#hallRequest{state=nothing}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
 % DENNE ER FARLIG!!
 % Men uten denne så vil ny node stucke de andre i done til nothing consensus
@@ -56,7 +57,7 @@ consense_request(#hallRequest{state=State, observedBy=ObservedBy}) ->
 
     % TODO: Pass på at noder som ikke lenger er aktiv, ikke blir tatt med i beregningen her? det er en svakhet med å bare ta opptelling
     if
-        length(Nodes) + 1 == length(_ObservedBy) ->
+        length(_ObservedBy) >= length(Nodes) + 1 ->
             #hallRequest{state=advance(State)};
             %case State of
             %    done -> #hallRequest{};

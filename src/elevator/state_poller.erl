@@ -31,6 +31,11 @@ state_server(DriverPid, Elevator, HallCalls) ->
                     (Elevator#elevator.cabCalls =/= _CabCalls)
                     or (Elevator#elevator.floor =/= _Floor)
                     or HasIncomingHallCalls ->
+
+                        % TODO: kode må være delt inn bra, ansvar osv!
+                        elevator_interface:set_floor_indicator(DriverPid, _Floor),
+                        set_cab_button_lights(DriverPid, _CabCalls),
+
                         % TODO: REFACTOR THE SHIT OUT OF THIS UNDER
                         Tmp = if 
                             (_Elevator#elevator.direction == down) and (_Elevator#elevator.floor == 0) -> stop;
@@ -48,6 +53,8 @@ state_server(DriverPid, Elevator, HallCalls) ->
 
                 % Detect done cab-calls
                 _CabCalls = [if B == done -> false; true -> A end || {A,B} <- lists:zip(Elevator#elevator.cabCalls, CabCalls)],
+
+                set_cab_button_lights(DriverPid, _CabCalls),
 
                 _Elevator = Elevator#elevator{behaviour=Behaviour, direction=Direction, cabCalls=_CabCalls},
 
@@ -109,6 +116,19 @@ set_hall_button_lights_internal(DriverPid, [{#hallRequest{state=HallUp}, #hallRe
     elevator_interface:set_order_button_light(DriverPid, hall_up, N, UpOn),
     elevator_interface:set_order_button_light(DriverPid, hall_down, N, DownOn),
     set_hall_button_lights_internal(DriverPid, Tail, N+1).
+
+set_cab_button_lights(Pid, CabCalls) ->
+        set_cab_button_lights_internal(Pid, CabCalls, 0).
+        
+set_cab_button_lights_internal(_, [], _) -> ok;
+
+set_cab_button_lights_internal(Pid, [CabCall | Tail], N) ->
+    LightOn = if
+        CabCall -> on;
+        true -> off
+    end,
+    elevator_interface:set_order_button_light(Pid, cab, N, LightOn),
+    set_cab_button_lights_internal(Pid, Tail, N+1).
 
 poller(DriverPid, NumFloors) ->
 
