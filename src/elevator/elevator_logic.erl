@@ -107,7 +107,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
         true -> false
     end, 
 
-    _State = if 
+    _State = if
         CabStop -> State#elevator{
             cabCalls=setnth(
                 State#elevator.floor+1,
@@ -127,7 +127,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
     end,
 
     if
-        CabStop or HallUpStop or HallDownStop -> 
+        CabStop or HallUpStop or HallDownStop ->
             % state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen,direction=stop}, _HallCalls}},
             state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen}, _HallCalls}},
             stop_at_floor(Pid, State#elevator.floor);
@@ -136,11 +136,10 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
 stop_at_floor(Pid, Floor) ->
     elevator_interface:set_motor_direction(Pid, stop),
-    elevator_interface:set_order_button_light(Pid, cab, Floor, off),
     elevator_interface:set_door_open_light(Pid, on),
     timer:sleep(2000),  % Remain open for 2 sec. Alt. move to case beneath.
     case elevator_interface:get_obstruction_switch_state(Pid) of
-        1 -> stop_at_floor(Pid, Floor);
+        active -> stop_at_floor(Pid, Floor);
         _ -> ok
     end,
     elevator_interface:set_door_open_light(Pid, off). % Close within 5 seconds?

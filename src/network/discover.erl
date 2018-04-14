@@ -2,6 +2,7 @@
 -export([start/0]).
 
 -define(DISCOVER_PORT, 8888).
+-define(DISCOVER_RATE, 1000).
 
 start() ->
     {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {reuseaddr, true}, {broadcast, true}]),
@@ -14,16 +15,16 @@ broadcast(Socket, []) ->
     % gen_udp:send(Socket, {129,241,187,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
     gen_udp:send(Socket, {10,22,39,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
 
-    timer:sleep(1000),
+    timer:sleep(?DISCOVER_RATE),
     broadcast(Socket, nodes());
 
-broadcast(_, _) -> ok.
+%broadcast(_, _) -> ok.
 
-% TODO: Gode ideer her:
+% TODO: Virker denne? MÅ sjekkes
 % Evig loop, starter broadcast igjen dersom node-listen tømmes
-% broadcast(Socket, _) ->
-%     timer:sleep(10000), % timeout nesten
-%     broadcast(Socket, nodes()).
+broadcast(Socket, _) ->
+    timer:sleep(?DISCOVER_RATE),
+    broadcast(Socket, nodes()).
 
 listen(Socket) ->
     receive
