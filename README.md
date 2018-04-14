@@ -27,13 +27,13 @@ Release
 
 Notes on generating binary:
 
-- Erlang cookie må settes i release
-- IP-er må settes
+- må være utenfor bin-mappen for å kjøre start scriptet ´./bin/dev_elevator-0.0.1´
+- Hall_request_assigneren må i apps i release mappen.
+- Erlang cookie og node-navn blir satt av relx til release-navnet, dette er bra
+- IP-en må være den default start-metoden
 - A release on linux will run on linux (no cross-platform releases)
 - No config files allowed, ikke noe problem egentlig, det bruker vi kun til testing
 - `include_erts` gjør at erlang ikke trenger å være installert, og sikrer riktig kjøring uansett versjon på maskinen
-- start-scriptet kjøres fra utsiden av bin mappen!!
-- Hall_request_assigneren må pakkes med!
 
 ----
 
