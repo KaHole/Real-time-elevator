@@ -5,6 +5,7 @@
 -export([start/2, stop/1]).
 
 -define(NUM_FLOORS, 4).
+-define(TICKTIME, 15).
 
 start(_StartType, _StartArgs) ->
 
@@ -13,6 +14,9 @@ start(_StartType, _StartArgs) ->
     % relx gir appen short-name (node navn) by default "dev_elevator@datamaskin"
     % Den setter også en cookie by default; samme verdi "dev_elevator"
     % Disse kan selvsagt settes i relx config / vim.config som pekes på, men er gode defaults egentlig.
+
+    % Set tick rate for erlang detecting down nodes
+    net_kernel:set_net_ticktime(?TICKTIME),
 
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
@@ -27,10 +31,10 @@ start(_StartType, _StartArgs) ->
 
     discover:start(),
     % Test for mac:
-    %{connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
-    %{connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
-    %{connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
-    %{connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
+    % {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
+    % {connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
+    % {connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
+    % {connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
     coordinator:start(WorldState),
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
     elevator_logic:start(DriverPid),
