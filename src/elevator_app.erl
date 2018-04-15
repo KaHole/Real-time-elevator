@@ -15,8 +15,6 @@ start(_StartType, _StartArgs) ->
     % Den setter også en cookie by default; samme verdi "dev_elevator"
     % Disse kan selvsagt settes i relx config / vim.config som pekes på, men er gode defaults egentlig.
 
-    erlang:set_cookie(node(), "elevator_bananpose"),
-
     net_kernel:stop(),
 
     {_, [{addr, Ip}|_]} = inet:ifget("eno1", [addr]),
@@ -25,6 +23,8 @@ start(_StartType, _StartArgs) ->
     Name = "elevator@" ++ IpString,
 
     net_kernel:start([list_to_atom(Name), longnames, ?TICKTIME]),
+
+    erlang:set_cookie(node(), "elevator_bananpose"),
 
     % Set tick rate for erlang detecting down nodes
     %net_kernel:set_net_ticktime(?TICKTIME),
