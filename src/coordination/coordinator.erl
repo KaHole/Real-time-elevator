@@ -22,7 +22,7 @@ observe(Elevators, HallRequests) ->
                 _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
 
                 %io:format("~p~n", [ExternalHallRequests]),
-                io:format("~p~n", [_HallRequests]),
+                %io:format("~p~n", [_HallRequests]),
 
                 % Send hall-requests to turn on/off the order lights
                 state_poller ! {set_hall_order_button_lights, _HallRequests},

@@ -15,8 +15,17 @@ start(_StartType, _StartArgs) ->
     % Den setter også en cookie by default; samme verdi "dev_elevator"
     % Disse kan selvsagt settes i relx config / vim.config som pekes på, men er gode defaults egentlig.
 
+    net_kernel:stop(),
+
+    {_, [{addr, Ip}|_]} = inet:ifget("eno1", [addr]),
+
+    IpString = inet_parse:ntoa(Ip),
+    Name = "elevator@" ++ IpString,
+
+    net_kernel:start([list_to_atom(Name), longnames, ?TICKTIME]),
+
     % Set tick rate for erlang detecting down nodes
-    net_kernel:set_net_ticktime(?TICKTIME),
+    %net_kernel:set_net_ticktime(?TICKTIME),
 
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
@@ -24,10 +33,10 @@ start(_StartType, _StartArgs) ->
     % Release skal helst starte alt med en binary om mulig, uten config
 
     %TODO: Fjerne dette før release
-    {_, Port} = application:get_env(port),
+    %{_, Port} = application:get_env(port),
 
-    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
-    % {_, DriverPid} = elevator_interface:start(),
+    %{_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
+    {_, DriverPid} = elevator_interface:start(),
 
     discover:start(),
     % Test for mac:

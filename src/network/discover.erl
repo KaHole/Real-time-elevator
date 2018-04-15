@@ -11,9 +11,9 @@ start() ->
     spawn(fun() -> broadcast(Socket, nodes()) end).
 
 broadcast(Socket, []) ->
-    % gen_udp:send(Socket, {172,20,10,15}, ?DISCOVER_PORT, atom_to_list(node(self()))),
-    % gen_udp:send(Socket, {129,241,187,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
-    gen_udp:send(Socket, {10,22,39,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    %gen_udp:send(Socket, {172,20,10,15}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    gen_udp:send(Socket, {129,241,187,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
+    %gen_udp:send(Socket, {10,22,39,255}, ?DISCOVER_PORT, atom_to_list(node(self()))),
 
     timer:sleep(?DISCOVER_RATE),
     broadcast(Socket, nodes());
@@ -29,17 +29,16 @@ broadcast(Socket, _) ->
 listen(Socket) ->
     receive
         {udp, Socket, _, _, List} ->
-            io:format("Discovered ~p~n", [List]),
-
             DiscoveredNode = list_to_atom(List),
 
             case node() =:= DiscoveredNode of
                 false ->
+                    io:format("Discovered ~p~n", [List]),
                     io:format("connecting to ~p~n", [List]),
                     % net_kernel:connect_node(DiscoveredNode),
-                    {connect, DiscoveredNode} ! ping;
+                    {connect, DiscoveredNode} ! ping,
+                    io:format("Nodes: ~p~n", [nodes()]);
                 _ -> ok
-            end,
-            io:format("Nodes: ~p~n", [nodes()])
+            end
     end,
     listen(Socket).
