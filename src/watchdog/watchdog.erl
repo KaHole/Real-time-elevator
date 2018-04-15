@@ -12,6 +12,8 @@ start(HallRequestState) ->
 watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
     receive
         {watch_hall_requests, _HallRequestStates, _AssignedElevators} ->
+            io:format("HallReq: ~p~n", [HallRequestStates]),
+            io:format("_HallReq: ~p~n", [_HallRequestStates]),
             Diff = [(New == Old) and (New == accepted) || {New, Old} <- lists:zip(lists:flatten(_HallRequestStates), lists:flatten(HallRequestStates))],
             _HallRequestTimes = update_times(Diff, HallRequestTimes),
             % _HallRequestTimeouts = list_to_tuples(timed_out(_HallRequestTimes)),
@@ -21,6 +23,7 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
         {kill} ->
             io:fwrite("Timed out, got killed. ~p~n.", [self()]),
             ok
+        after 1000 -> ok
     end,
     HallRequestTimeouts = list_to_tuples(timed_out(HallRequestTimes)),
     TimedOutElevators = find_timed_out_elevators(HallRequestTimeouts, AssignedElevators),

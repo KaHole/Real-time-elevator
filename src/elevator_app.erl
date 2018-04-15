@@ -35,6 +35,7 @@ start(_StartType, _StartArgs) ->
     {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
     %{_, DriverPid} = elevator_interface:start(),
 
+    watchdog:start(lists:duplicate(?NUM_FLOORS, [nothing,nothing])),
     discover:start(),
     % Test for mac:
     % {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
@@ -44,7 +45,6 @@ start(_StartType, _StartArgs) ->
     coordinator:start(WorldState),
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
     elevator_logic:start(DriverPid),
-    watchdog:start(lists:duplicate(?NUM_FLOORS, [nothing,nothing])),
 
     %TODO: fjern og slett den filen? eller skal vi bruke denne til monitoring/fault tolerance?
     elevator_sup:start_link().

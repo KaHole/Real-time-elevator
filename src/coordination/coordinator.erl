@@ -47,7 +47,7 @@ observe(Elevators, HallRequests) ->
 
                 {AssignedHallCalls, ElevatorDelegation} = hall_request_assigner:assign(_Elevators, _HallRequestStates),
 
-                watchdog ! {watch_hall_requests, HallRequestStates, ElevatorDelegation},
+                watchdog ! {watch_hall_requests, _HallRequestStates, ElevatorDelegation},
 
                 % Sends assigned hall-requests to elevator logic
                 state_poller ! {set_hall_calls, AssignedHallCalls}
