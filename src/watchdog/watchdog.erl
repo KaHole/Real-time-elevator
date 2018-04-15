@@ -19,6 +19,7 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
         {kill} ->
             io:fwrite("Timed out, got killed. ~p~n.", [self()]),
             exit(whereis(discover), kill),
+            stop_elevator(),
             net_kernel:stop(),
             timer:sleep(?QUARANTINE),
             io:fwrite("Karantene~n"),
@@ -66,3 +67,7 @@ check_timed_out_requests(Assigned, TimedOut) ->
 get_time() -> 
     {Big, Small, _} = erlang:now(),
     (Big * 1000000 + Small).
+
+stop_elevator() ->
+    exit(whereis(elevator_controller), kill),
+    elevator_interface:set_motor_direction(whereis(driver_pid), stop).
