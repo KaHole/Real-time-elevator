@@ -4,7 +4,7 @@
 
 assign(Elevators, HallRequestStates) ->
 
-    HasAcceptedHallRequests = lists:any(fun({HallUp, HallDown}) ->
+    HasAcceptedHallRequests = lists:any(fun([HallUp, HallDown]) ->
         (HallUp =:= accepted) or (HallDown =:= accepted) end, HallRequestStates),
 
     if 
@@ -30,7 +30,7 @@ assign(Elevators, HallRequestStates) ->
     end.
 
 hall_requests_to_json(HallRequestStates) ->
-    json(lists:map(fun({HallUp, HallDown}) ->
+    json(lists:map(fun([HallUp, HallDown]) ->
                            [HallUp =:= accepted, HallDown =:= accepted] end,
                    HallRequestStates)).
 

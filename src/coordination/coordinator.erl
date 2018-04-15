@@ -47,7 +47,7 @@ observe(Elevators, HallRequests) ->
 
                 {AssignedHallCalls, ElevatorDelegation} = hall_request_assigner:assign(_Elevators, _HallRequestStates),
 
-                watchdog ! {watch_hall_requests, HallRequestStates, ElevatorDelegation},
+                watchdog ! {watch_hall_requests, _HallRequestStates, ElevatorDelegation},
 
                 % Sends assigned hall-requests to elevator logic
                 state_poller ! {set_hall_calls, AssignedHallCalls}
@@ -91,7 +91,7 @@ generate_hall_request(false) -> #hallRequest{}.
 map_hall_request_state(HallRequests) ->
     lists:map(
         fun({HallUp, HallDown}) ->
-            {HallUp#hallRequest.state, HallDown#hallRequest.state}
+            [HallUp#hallRequest.state, HallDown#hallRequest.state]
         end, HallRequests).
 
 detect_done_advancements([], []) -> [];
