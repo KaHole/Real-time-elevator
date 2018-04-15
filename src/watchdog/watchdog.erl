@@ -2,7 +2,7 @@
 
 -export([start/1]).
 
--define(TIMEOUT, 10).
+-define(TIMEOUT, 25).
 -define(QUARANTINE, 10000).
 
 start(HallRequestState) -> 
