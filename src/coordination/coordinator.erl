@@ -91,7 +91,7 @@ generate_hall_request(false) -> #hallRequest{}.
 map_hall_request_state(HallRequests) ->
     lists:map(
         fun({HallUp, HallDown}) ->
-            {HallUp#hallRequest.state, HallDown#hallRequest.state}
+            [HallUp#hallRequest.state, HallDown#hallRequest.state]
         end, HallRequests).
 
 detect_done_advancements([], []) -> [];
