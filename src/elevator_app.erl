@@ -24,7 +24,7 @@ start(_StartType, _StartArgs) ->
 
     net_kernel:start([list_to_atom(Name), longnames, ?TICKTIME]),
 
-    erlang:set_cookie(node(), "elevator_bananpose"),
+    erlang:set_cookie(node(), 'elevator_bananpose'),
 
     % Set tick rate for erlang detecting down nodes
     %net_kernel:set_net_ticktime(?TICKTIME),
