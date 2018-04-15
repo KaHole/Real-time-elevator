@@ -6,14 +6,12 @@
 
 start(HallRequestState) -> 
     register(watchdog, 
-        spawn(fun() -> watchdog(HallRequestState, lists:duplicate(length(HallRequestState), [0,0]), []) end)
+        spawn(fun() -> watchdog(HallRequestState, lists:duplicate(length(HallRequestState)*2, 0), []) end)
     ).
 
 watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
     receive
         {watch_hall_requests, _HallRequestStates, _AssignedElevators} ->
-            io:format("HallReq: ~p~n", [HallRequestStates]),
-            io:format("_HallReq: ~p~n", [_HallRequestStates]),
             Diff = [(New == Old) and (New == accepted) || {New, Old} <- lists:zip(lists:flatten(_HallRequestStates), lists:flatten(HallRequestStates))],
             _HallRequestTimes = update_times(Diff, HallRequestTimes),
             % _HallRequestTimeouts = list_to_tuples(timed_out(_HallRequestTimes)),
@@ -22,13 +20,16 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
             watchdog(_HallRequestStates, _HallRequestTimes, _AssignedElevators);
         {kill} ->
             io:fwrite("Timed out, got killed. ~p~n.", [self()]),
+            init:restart(),
             ok
         after 1000 -> ok
     end,
+    io:fwrite("~p~n", [get_time()]),
     HallRequestTimeouts = list_to_tuples(timed_out(HallRequestTimes)),
-    TimedOutElevators = find_timed_out_elevators(HallRequestTimeouts, AssignedElevators),
+    ResetTimeouts = reset_timeouts(HallRequestTimes),
+    TimedOutElevators = lists:delete(node(), find_timed_out_elevators(HallRequestTimeouts, AssignedElevators)),
     [{watchdog, N} ! {kill} || N <- TimedOutElevators],
-    watchdog(HallRequestStates, HallRequestTimes, AssignedElevators).
+    watchdog(HallRequestStates, ResetTimeouts, AssignedElevators).
 
 update_times([], []) -> [];
 update_times([true|StateTail], [TimeHead|TimeTail]) -> [TimeHead|update_times(StateTail, TimeTail)];
@@ -36,6 +37,15 @@ update_times([false|StateTail], [_|TimeTail]) -> [get_time()|update_times(StateT
 
 timed_out([]) -> [];
 timed_out([TimeHead|TimeTail]) -> [TimeHead+?TIMEOUT < get_time()|timed_out(TimeTail)].
+
+reset_timeouts([]) -> [];
+reset_timeouts([TimeHead|TimeTail]) -> 
+    Time = get_time(),
+    Reset = if
+        TimeHead+?TIMEOUT < Time -> Time;
+        true -> TimeHead
+    end,
+    [Reset|reset_timeouts(TimeTail)].
 
 list_to_tuples([]) -> [];
 list_to_tuples([HeadUp,HeadDown|Tail]) -> [[HeadUp,HeadDown]|Tail].
