@@ -5,7 +5,7 @@
 -export([start/2, stop/1]).
 
 -define(NUM_FLOORS, 4).
--define(TICKTIME, 60).
+-define(TICKTIME, 15000).
 
 start(_StartType, _StartArgs) ->
 
