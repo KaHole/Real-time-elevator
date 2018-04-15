@@ -1,7 +1,7 @@
 -module(discover).
 -export([start/0]).
 
--define(DISCOVER_PORT, 8888).
+-define(DISCOVER_PORT, 28960).
 -define(DISCOVER_RATE, 1000).
 
 start() ->

@@ -65,7 +65,7 @@ check_timed_out_requests(Assigned, TimedOut) ->
     lists:any(fun({A,B}) -> (A == B) and B end, lists:zip(lists:flatten(Assigned), lists:flatten(TimedOut))).
 
 get_time() -> 
-    {Big, Small, _} = erlang:now(),
+    {Big, Small, _} = os:timestamp(),
     (Big * 1000000 + Small).
 
 stop_elevator() ->
