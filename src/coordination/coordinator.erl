@@ -19,38 +19,11 @@ observe(Elevators, HallRequests) ->
 
                 %io:fwrite("foreign elevator ~n"),
                 _Elevators = update_elevator(Elevators, Id, Elevator),
-                _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
+                _HallRequests = handle_hall_requests({_Elevators, HallRequests}, ExternalHallRequests)
 
-                %io:format("~p~n", [ExternalHallRequests]),
-                %io:format("~p~n", [_HallRequests]),
-
-                % Send hall-requests to turn on/off the order lights
-                state_poller ! {set_hall_order_button_lights, _HallRequests},
-
-                % Get only the states of the hall-requests for comparison (change detection)
-                HallRequestStates = map_hall_request_state(HallRequests),
-                _HallRequestStates = map_hall_request_state(_HallRequests),
-
-                % TODO: Is this enough redundancy??
-                if
-                    _HallRequestStates =/= HallRequestStates ->
-                    %_HallRequests =/= HallRequests ->
-
-                        RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
-
-                        {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-                        % io:format("~p~n", [_HallRequestStates]),
-                        broadcast_state(LocalElevator, RedundantDoneHallRequests);
-
-                    true -> ok
-                end,
-
-                {AssignedHallCalls, ElevatorDelegation} = hall_request_assigner:assign(_Elevators, _HallRequestStates),
-
-                watchdog ! {watch_hall_requests, _HallRequestStates, ElevatorDelegation},
-
-                % Sends assigned hall-requests to elevator logic
-                state_poller ! {set_hall_calls, AssignedHallCalls}
+            after 3000 ->
+                _Elevators = Elevators,
+                _HallRequests = handle_hall_requests({Elevators, HallRequests}, HallRequests)
         end
     end,
 
@@ -70,6 +43,38 @@ handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
 
     broadcast_state(Elevator, _HallRequests),
     {_Elevators, _HallRequests}.
+
+handle_hall_requests({Elevators, HallRequests}, ExternalHallRequests) ->
+    _HallRequests = consensus:consense(HallRequests, ExternalHallRequests),
+
+    % Send hall-requests to turn on/off the order lights
+    state_poller ! {set_hall_order_button_lights, _HallRequests},
+
+    % Get only the states of the hall-requests for comparison (change detection)
+    HallRequestStates = map_hall_request_state(HallRequests),
+    _HallRequestStates = map_hall_request_state(_HallRequests),
+
+    % TODO: Is this enough redundancy??
+    if
+        _HallRequestStates =/= HallRequestStates ->
+        %_HallRequests =/= HallRequests ->
+
+            RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
+
+            {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
+            % io:format("~p~n", [_HallRequestStates]),
+            broadcast_state(LocalElevator, RedundantDoneHallRequests);
+
+        true -> ok
+    end,
+
+    {AssignedHallCalls, ElevatorDelegation} = hall_request_assigner:assign(Elevators, _HallRequestStates),
+
+    watchdog ! {watch_hall_requests, _HallRequestStates, ElevatorDelegation},
+
+    % Sends assigned hall-requests to elevator logic
+    state_poller ! {set_hall_calls, AssignedHallCalls},
+    _HallRequests.
 
 
 update_elevator(Elevators, Id, Elevator) ->
