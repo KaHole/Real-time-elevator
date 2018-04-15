@@ -8,31 +8,22 @@ Modules
 ----
 
 - [ ] Gå over kriterier for evaluering og spec for å få god karakter
-- [ ] Heartbeats / fault-recovery / tolerance
-
 - [ ] `erl_tidy` kan brukes for formattering og optimalisering
 - [ ] Style guide: https://github.com/inaka/erlang_guidelines
-
-- [x] Elevator logic
-- [x] Coordinator (main)
-- [x] Consensus state machine
-- [x] Hall request assigner integration
-- [x] Networking
-- [x] Node discovery
-- [x] Elevator driver (premade)
 
 Release
 ----
     $ rebar3 release
 
-Notes on generating binary:
+Release check list:
 
-- må være utenfor bin-mappen for å kjøre start scriptet ´./bin/dev_elevator-0.0.1´
-- Hall_request_assigneren må i apps i release mappen.
-- Erlang cookie og node-navn blir satt av relx til release-navnet, dette er bra
-- IP-en må være den default start-metoden
-- A release on linux will run on linux (no cross-platform releases)
-- No config files allowed, ikke noe problem egentlig, det bruker vi kun til testing
+- [ ] EPMD må være startet, eller startes
+- [ ] egen start.sh kan lages for å forsikre epmd og starte bin scriptet. Den kan forsovet også starte elevator-server med riktig port!
+- [ ] må være utenfor bin-mappen for å kjøre start scriptet ´./bin/dev_elevator-0.0.1´
+- [ ] Hall_request_assigneren må i apps i release mappen.
+
+- [ ] IP for broadcast, og IP for elevator-server må være på stell.
+- [ ] A release on linux will run on linux (no cross-platform releases)
 - `include_erts` gjør at erlang ikke trenger å være installert, og sikrer riktig kjøring uansett versjon på maskinen
 
 ----
