@@ -3,6 +3,7 @@
 -export([start/1]).
 
 -define(TIMEOUT, 10).
+-define(QUARANTINE, 10000).
 
 start(HallRequestState) -> 
     register(watchdog, 
@@ -14,12 +15,13 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
         {watch_hall_requests, _HallRequestStates, _AssignedElevators} ->
             Diff = [(New == Old) and (New == accepted) || {New, Old} <- lists:zip(lists:flatten(_HallRequestStates), lists:flatten(HallRequestStates))],
             _HallRequestTimes = update_times(Diff, HallRequestTimes),
-            % _HallRequestTimeouts = list_to_tuples(timed_out(_HallRequestTimes)),
-            % TimedOutElevators=find_timed_out_elevators(_HallRequestTimeouts, AssignedElevators),
-            % [{watchdog, N} ! {kill} || N <- TimedOutElevators],
             watchdog(_HallRequestStates, _HallRequestTimes, _AssignedElevators);
         {kill} ->
             io:fwrite("Timed out, got killed. ~p~n.", [self()]),
+            exit(whereis(discover), kill),
+            net_kernel:stop(),
+            timer:sleep(?QUARANTINE),
+            io:fwrite("Karantene~n"),
             init:restart(),
             ok
         after 1000 -> ok

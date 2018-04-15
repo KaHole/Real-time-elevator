@@ -21,7 +21,7 @@ observe(Elevators, HallRequests) ->
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = handle_hall_requests({_Elevators, HallRequests}, ExternalHallRequests)
 
-            after 3000 ->
+            after 2000 ->
                 _Elevators = Elevators,
                 _HallRequests = handle_hall_requests({Elevators, HallRequests}, HallRequests)
         end

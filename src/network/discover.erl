@@ -8,7 +8,7 @@ start() ->
     {ok, Socket} = gen_udp:open(?DISCOVER_PORT, [list, {active, true}, {reuseaddr, true}, {broadcast, true}]),
     Listener = spawn(fun() -> listen(Socket) end),
     gen_udp:controlling_process(Socket, Listener),
-    spawn(fun() -> broadcast(Socket, nodes()) end).
+    register(discover, spawn(fun() -> broadcast(Socket, nodes()) end)).
 
 broadcast(Socket, []) ->
     %gen_udp:send(Socket, {172,20,10,15}, ?DISCOVER_PORT, atom_to_list(node(self()))),
