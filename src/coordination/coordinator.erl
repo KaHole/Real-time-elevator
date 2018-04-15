@@ -116,43 +116,5 @@ done_advanced(#hallRequest{state=done}, #hallRequest{state=nothing}) -> true;
 
 done_advanced(_, _) -> false.
 
-
-% TODO: NEEDS REFACTORING, This whole thing.. the upper most pair is a special case where both are in the done advancement at the same time.
-% NB! Dette løser ikke alt!! Hva om ene går fra accepted til nothing, andre går fra done til nothing
-% MÅ refaktoreres for å løses!
-% detect_done_advancements([{#hallRequest{state=accepted} = HallUp, #hallRequest{state=accepted} = HallDown} | Tail],
-%                         [{#hallRequest{state=nothing}, #hallRequest{state=nothing}} | NewTail]) ->
-
-%     [{HallUp#hallRequest{state=done, observedBy = HallUp#hallRequest.observedBy ++ nodes()},
-%     HallDown#hallRequest{state=done, observedBy = HallDown#hallRequest.observedBy ++ nodes()} }] ++ detect_done_advancements(Tail, NewTail);
-
-% detect_done_advancements([{#hallRequest{state=done} = HallUp, #hallRequest{state=done} = HallDown} | Tail], [{#hallRequest{state=nothing}, #hallRequest{state=nothing}} | NewTail]) ->
-%     [{HallUp#hallRequest{observedBy = HallUp#hallRequest.observedBy ++ nodes()},
-%     HallDown#hallRequest{observedBy = HallDown#hallRequest.observedBy ++ nodes()} }] ++ detect_done_advancements(Tail, NewTail);
-
-% %% end BOTH
-
-% detect_done_advancements([{#hallRequest{state=accepted} = HallUp, _} | Tail], [{#hallRequest{state=nothing}, NewHallDown} | NewTail]) ->
-%     [{HallUp#hallRequest{state=done, observedBy = HallUp#hallRequest.observedBy ++ nodes()},
-%     NewHallDown}] ++ detect_done_advancements(Tail, NewTail);
-
-% detect_done_advancements([{#hallRequest{state=done} = HallUp, _} | Tail], [{#hallRequest{state=nothing}, NewHallDown} | NewTail]) ->
-%     [{HallUp#hallRequest{observedBy = HallUp#hallRequest.observedBy ++ nodes()},
-%     NewHallDown}] ++ detect_done_advancements(Tail, NewTail);
-
-% detect_done_advancements([{_, #hallRequest{state=accepted} = HallDown} | Tail], [{NewHallUp, #hallRequest{state=nothing}} | NewTail]) ->
-%     [{NewHallUp,
-%     HallDown#hallRequest{state=done, observedBy = HallDown#hallRequest.observedBy ++ nodes()} }]
-%     ++ detect_done_advancements(Tail, NewTail);
-
-% detect_done_advancements([{_, #hallRequest{state=done} = HallDown} | Tail], [{NewHallUp, #hallRequest{state=nothing}} | NewTail]) ->
-%     [{NewHallUp,
-%     HallDown#hallRequest{observedBy = HallDown#hallRequest.observedBy ++ nodes()} }]
-%     ++ detect_done_advancements(Tail, NewTail);
-
-% detect_done_advancements([_ | Tail], [NewHallRequest | NewTail]) ->
-%     [NewHallRequest] ++ detect_done_advancements(Tail, NewTail).
-
-
 broadcast_state(Elevator, HallRequests) ->
     [{coordinator, N} ! {elevator_update, node(), Elevator, HallRequests} || N <- nodes()].

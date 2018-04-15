@@ -18,9 +18,6 @@ broadcast(Socket, []) ->
     timer:sleep(?DISCOVER_RATE),
     broadcast(Socket, nodes());
 
-%broadcast(_, _) -> ok.
-
-% TODO: Virker denne? MÅ sjekkes
 % Evig loop, starter broadcast igjen dersom node-listen tømmes
 broadcast(Socket, _) ->
     timer:sleep(?DISCOVER_RATE),

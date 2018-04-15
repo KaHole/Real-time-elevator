@@ -11,34 +11,29 @@ start(_StartType, _StartArgs) ->
 
     % TODO:
     % Viktig info for release:
-    % relx gir appen short-name (node navn) by default "dev_elevator@datamaskin"
-    % Den setter også en cookie by default; samme verdi "dev_elevator"
-    % Disse kan selvsagt settes i relx config / vim.config som pekes på, men er gode defaults egentlig.
+    % må skyte inn riktig node navn
+    % Men net_kernel:stop er litt insane måte å gjøre det på
 
-    net_kernel:stop(),
+    {_, Interface} = inet:ifget("eno1", [addr]),
 
-    {_, [{addr, Ip}|_]} = inet:ifget("eno1", [addr]),
+    case Interface of
+        [{addr, Ip}|_] ->
+            Name = list_to_atom("elevator@" ++ inet_parse:ntoa(Ip)),
+            net_kernel:stop(),
+            net_kernel:start([Name, longnames, ?TICKTIME]);
+        _ -> net_kernel:set_net_ticktime(?TICKTIME)
+    end,
 
-    IpString = inet_parse:ntoa(Ip),
-    Name = "elevator@" ++ IpString,
-
-    net_kernel:start([list_to_atom(Name), longnames, ?TICKTIME]),
-
-    erlang:set_cookie(node(), 'elevator_bananpose'),
-
-    % Set tick rate for erlang detecting down nodes
-    %net_kernel:set_net_ticktime(?TICKTIME),
+    erlang:set_cookie(node(), 'bananpose'),
 
     Elevator = make_elevator(),
     WorldState = make_world_state(Elevator),
 
-    % Release skal helst starte alt med en binary om mulig, uten config
-
     %TODO: Fjerne dette før release
-    %{_, Port} = application:get_env(port),
+    {_, Port} = application:get_env(port),
 
-    %{_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
-    {_, DriverPid} = elevator_interface:start(),
+    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
+    %{_, DriverPid} = elevator_interface:start(),
 
     discover:start(),
     % Test for mac:
@@ -56,7 +51,6 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok.
 
-%% MOVE to worldstate.hrl ?? .. will have to move includes beneath exports, but thats fine!
 make_world_state(Elevator) ->
     HallRequests = lists:duplicate(?NUM_FLOORS, {#hallRequest{}, #hallRequest{}}),
     LocalElevator = {node(), Elevator},
