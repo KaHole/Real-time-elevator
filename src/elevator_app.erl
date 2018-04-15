@@ -30,11 +30,11 @@ start(_StartType, _StartArgs) ->
     WorldState = make_world_state(Elevator),
 
     %TODO: Fjerne dette før release
-    {_, Port} = application:get_env(port),
+    % {_, Port} = application:get_env(port),
 
-    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
+    % {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
+    {_, DriverPid} = elevator_interface:start(),
     register(driver_pid, DriverPid),
-    %{_, DriverPid} = elevator_interface:start(),
 
     watchdog:start(lists:duplicate(?NUM_FLOORS, [nothing,nothing])),
     discover:start(),
