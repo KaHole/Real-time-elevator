@@ -24,7 +24,7 @@ Architecture
 ----
 
 # Rebar3
-## Run
+## Run single elevator
     $ rebar3 shell --sname one --apps elevator
 ## Compile
     $ rebar3 compile
