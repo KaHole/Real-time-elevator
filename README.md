@@ -16,6 +16,7 @@ Architecture
 
 1. Start elevator server or simulator on default ports
 2. Run the start-script:
+
     ./start.sh
 
 # Development
