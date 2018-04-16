@@ -53,10 +53,8 @@ handle_hall_requests({Elevators, HallRequests}, ExternalHallRequests) ->
     HallRequestStates = map_hall_request_state(HallRequests),
     _HallRequestStates = map_hall_request_state(_HallRequests),
 
-    % TODO: Is this enough redundancy??
     if
         _HallRequestStates =/= HallRequestStates ->
-        %_HallRequests =/= HallRequests ->
 
             RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
 
