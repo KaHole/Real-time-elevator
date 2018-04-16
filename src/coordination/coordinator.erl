@@ -6,7 +6,7 @@ start({Elevators, HallRequests}) ->
     register(coordinator, spawn(fun() -> observe(Elevators, HallRequests) end)).
 
 observe(Elevators, HallRequests) ->
-    % Give priority to local_elevator-updates
+    % Give priority to local_elevator-updates, using the receive, after 0 pattern
     receive
         {local_elevator_update, Elevator, HallCalls} ->
             {_Elevators, _HallRequests} = handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls)
@@ -20,7 +20,7 @@ observe(Elevators, HallRequests) ->
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = handle_hall_requests({_Elevators, HallRequests}, ExternalHallRequests)
 
-            after 2000 ->
+            after 2000 -> % trigger consensus periodically, so it still works even without messages
                 _Elevators = Elevators,
                 _HallRequests = handle_hall_requests({Elevators, HallRequests}, HallRequests)
         end
@@ -54,8 +54,8 @@ handle_hall_requests({Elevators, HallRequests}, ExternalHallRequests) ->
     _HallRequestStates = map_hall_request_state(_HallRequests),
 
     if
-        _HallRequestStates =/= HallRequestStates ->
-
+        _HallRequestStates =/= HallRequestStates -> % Only send message if any changes
+            % Adds some redundancy to the done-stage of hall-requests. (by repeating the step once)
             RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
 
             {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
@@ -95,6 +95,7 @@ map_hall_request_state(HallRequests) ->
             [HallUp#hallRequest.state, HallDown#hallRequest.state]
         end, HallRequests).
 
+% Function detecting if any hall-requests became done in the last step
 detect_done_advancements([], []) -> [];
 
 detect_done_advancements([{HallUp, HallDown}|Tail], [{NewHallUp, NewHallDown}|NewTail]) ->
