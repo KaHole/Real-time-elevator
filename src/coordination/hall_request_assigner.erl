@@ -21,7 +21,6 @@ assign(Elevators, HallRequestStates) ->
 
             JsonState = io_lib:format("'{\"hallRequests\": ~s, \"states\": {~s}}'", [hall_requests_to_json(HallRequestStates), ElevatorJson]),
 
-            % Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner_mac -i " ++ JsonState))),
             Data = jsone:decode(list_to_binary(os:cmd("./apps/hall_request_assigner -i " ++ JsonState))),
             {maps:get(list_to_binary(atom_to_list(node())), Data),
                 lists:map(fun({Id, Assigned}) -> {list_to_atom(binary_to_list(Id)), Assigned} end, maps:to_list(Data))};

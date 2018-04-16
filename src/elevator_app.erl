@@ -9,11 +9,6 @@
 
 start(_StartType, _StartArgs) ->
 
-    % TODO:
-    % Viktig info for release:
-    % må skyte inn riktig node navn
-    % Men net_kernel:stop er litt insane måte å gjøre det på
-
     {_, Interface} = inet:ifget("eno1", [addr]),
 
     case Interface of
@@ -30,24 +25,18 @@ start(_StartType, _StartArgs) ->
     WorldState = make_world_state(Elevator),
 
     %TODO: Fjerne dette før release
-    {_, Port} = application:get_env(port),
+    %{_, Port} = application:get_env(port),
+    %{_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
 
-    {_, DriverPid} = elevator_interface:start({127,0,0,1}, Port),
-    % {_, DriverPid} = elevator_interface:start(),
+    {_, DriverPid} = elevator_interface:start(),
     register(driver_pid, DriverPid),
 
     watchdog:start(lists:duplicate(?NUM_FLOORS, [nothing,nothing])),
     discover:start(),
-    % Test for mac:
-    % {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
-    % {connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
     coordinator:start(WorldState),
     state_poller:start(DriverPid, {Elevator, make_hall_calls()}),
     elevator_logic:start(DriverPid),
 
-    %TODO: fjern og slett den filen? eller skal vi bruke denne til monitoring/fault tolerance?
     elevator_sup:start_link().
 
 stop(_State) ->

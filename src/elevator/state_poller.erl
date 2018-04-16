@@ -2,7 +2,6 @@
 -include("../../include/worldstate.hrl").
 -export([start/2]).
 
-% TODO: Finn den perfekte poll rate
 -define(POLL_RATE, 180).
 
 start(DriverPid, {Elevator, HallCalls}) ->
