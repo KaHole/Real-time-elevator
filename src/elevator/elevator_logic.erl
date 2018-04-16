@@ -3,6 +3,8 @@
 
 -export([start/1]).
 
+-define(DOOR_OPEN_TIME, 3000).
+
 start(Pid) ->
     seek_nearest_floor(Pid, #elevator{floor=elevator_interface:get_floor_sensor_state(Pid)}),
 
@@ -133,7 +135,7 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 stop_at_floor(Pid, Floor) ->
     elevator_interface:set_motor_direction(Pid, stop),
     elevator_interface:set_door_open_light(Pid, on),
-    timer:sleep(2000),  % Remain open for 2 sec.
+    timer:sleep(?DOOR_OPEN_TIME),  % Remain open for 3 sec.
     case elevator_interface:get_obstruction_switch_state(Pid) of
         active -> stop_at_floor(Pid, Floor);
         _ -> ok
