@@ -2,8 +2,8 @@
 
 -export([start/1]).
 
--define(TIMEOUT, 25).
--define(QUARANTINE, 10000).
+-define(TIMEOUT, 25). % Hall-request timeout, in seconds (unix time)
+-define(QUARANTINE, 10000). % Quarantine for a timed out node in milliseconds
 
 start(HallRequestState) -> 
     register(watchdog, 
@@ -11,6 +11,7 @@ start(HallRequestState) ->
     ).
 
 watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
+
     receive
         {watch_hall_requests, _HallRequestStates, _AssignedElevators} ->
             Diff = [(New == Old) and (New == accepted) || {New, Old} <- lists:zip(lists:flatten(_HallRequestStates), lists:flatten(HallRequestStates))],
@@ -21,13 +22,13 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
             exit(whereis(discover), kill),
             stop_elevator(),
             net_kernel:stop(),
+            io:fwrite("Quarantine.. ~n"),
             timer:sleep(?QUARANTINE),
-            io:fwrite("Karantene~n"),
             init:restart(),
             ok
         after 1000 -> ok
     end,
-    io:fwrite("~p~n", [get_time()]),
+
     HallRequestTimeouts = list_to_tuples(timed_out(HallRequestTimes)),
     ResetTimeouts = reset_timeouts(HallRequestTimes),
     TimedOutElevators = lists:delete(node(), find_timed_out_elevators(HallRequestTimeouts, AssignedElevators)),
@@ -65,8 +66,7 @@ check_timed_out_requests(Assigned, TimedOut) ->
     lists:any(fun({A,B}) -> (A == B) and B end, lists:zip(lists:flatten(Assigned), lists:flatten(TimedOut))).
 
 get_time() -> 
-    {Big, Small, _} = os:timestamp(),
-    (Big * 1000000 + Small).
+    erlang:system_time(seconds).
 
 stop_elevator() ->
     exit(whereis(elevator_controller), kill),
