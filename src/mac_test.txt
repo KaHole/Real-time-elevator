@@ -1,8 +1,0 @@
-    % discover:start(),
-    % Test for mac:
-    {connect, 'one@Kristians-MacBook-Pro-2'} ! ping,
-    {connect, 'two@Kristians-MacBook-Pro-2'} ! ping,
-    {connect, 'three@Kristians-MacBook-Pro-2'} ! ping,
-    {connect, 'four@Kristians-MacBook-Pro-2'} ! ping,
-
-
