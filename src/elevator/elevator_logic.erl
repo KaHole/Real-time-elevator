@@ -20,10 +20,7 @@ seek_nearest_floor(Pid, _) ->
     elevator_interface:set_motor_direction(Pid, stop).
 
 elevator_controller(Pid) -> 
-    % io:fwrite("ele_ctrl~n"),
-    % TODO: needs testing of different rates? Seems pretty good now
-    %timer:sleep(250),
-    %timer:sleep(125),
+
     timer:sleep(50),
     state_poller ! {get_state, self()},
 
