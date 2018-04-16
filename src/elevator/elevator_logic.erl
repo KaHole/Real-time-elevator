@@ -125,7 +125,6 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 
     if
         CabStop or HallUpStop or HallDownStop ->
-            % state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen,direction=stop}, _HallCalls}},
             state_poller ! {driven_state_update, {_State#elevator{behaviour=doorOpen}, _HallCalls}},
             stop_at_floor(Pid, State#elevator.floor);
         true -> state_poller ! {driven_state_update, {_State, _HallCalls}}
@@ -134,12 +133,12 @@ check_arrival(Pid, State, CabHallCall, HallCalls) ->
 stop_at_floor(Pid, Floor) ->
     elevator_interface:set_motor_direction(Pid, stop),
     elevator_interface:set_door_open_light(Pid, on),
-    timer:sleep(2000),  % Remain open for 2 sec. Alt. move to case beneath.
+    timer:sleep(2000),  % Remain open for 2 sec.
     case elevator_interface:get_obstruction_switch_state(Pid) of
         active -> stop_at_floor(Pid, Floor);
         _ -> ok
     end,
-    elevator_interface:set_door_open_light(Pid, off). % Close within 5 seconds?
+    elevator_interface:set_door_open_light(Pid, off).
 
 % https://stackoverflow.com/questions/4776033/how-to-change-an-element-in-a-list-in-erlang
 setnth(1, [_|Rest], New) -> [New|Rest];

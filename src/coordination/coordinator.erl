@@ -17,7 +17,6 @@ observe(Elevators, HallRequests) ->
 
             {elevator_update, Id, Elevator, ExternalHallRequests} ->
 
-                %io:fwrite("foreign elevator ~n"),
                 _Elevators = update_elevator(Elevators, Id, Elevator),
                 _HallRequests = handle_hall_requests({_Elevators, HallRequests}, ExternalHallRequests)
 
@@ -30,7 +29,7 @@ observe(Elevators, HallRequests) ->
     observe(_Elevators, _HallRequests).
 
 handle_local_elevator_update({Elevators, HallRequests}, Elevator, HallCalls) ->
-    % io:fwrite("local elevator ~n"),
+
     _Elevators = update_elevator(Elevators, node(), Elevator),
     _HallRequests = update_hall_requests(HallRequests, HallCalls),
 
@@ -62,7 +61,6 @@ handle_hall_requests({Elevators, HallRequests}, ExternalHallRequests) ->
             RedundantDoneHallRequests = detect_done_advancements(HallRequests, _HallRequests),
 
             {_, LocalElevator} = lists:keyfind(node(), 1, Elevators),
-            % io:format("~p~n", [_HallRequestStates]),
             broadcast_state(LocalElevator, RedundantDoneHallRequests);
 
         true -> ok

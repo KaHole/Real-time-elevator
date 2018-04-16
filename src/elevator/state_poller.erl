@@ -12,7 +12,6 @@ start(DriverPid, {Elevator, HallCalls}) ->
 
 state_server(DriverPid, Elevator, HallCalls) ->
     
-    % TODO: is this priority right? it is important that the elevator gets to run of course ..
     receive
         {get_state, Sender} -> Sender ! {updated_state, {Elevator, HallCalls}}
         after 0 -> receive
@@ -33,12 +32,11 @@ state_server(DriverPid, Elevator, HallCalls) ->
                     or (Elevator#elevator.floor =/= _Floor)
                     or HasIncomingHallCalls ->
 
-                        % TODO: kode må være delt inn bra, ansvar osv!
                         elevator_interface:set_floor_indicator(DriverPid, _Floor),
                         set_cab_button_lights(DriverPid, _CabCalls),
 
                         coordinator ! {local_elevator_update, _Elevator#elevator{direction=get_valid_direction(_Elevator)}, IncomingHallCalls};
-                        %io:format("~p~n", ["----- POLLED CHANGES DETECTED -----"]);
+
                     true -> ok
                 end,
 
@@ -64,7 +62,7 @@ state_server(DriverPid, Elevator, HallCalls) ->
                     or (Elevator#elevator.direction =/= Direction)
                     or HasDoneHallCalls ->
                         coordinator ! {local_elevator_update, _Elevator#elevator{direction=get_valid_direction(_Elevator)}, ActedHallCalls};
-                        %io:format("~p~n", ["----- DRIVEN CHANGES DETECTED -----"]);
+
                     true -> ok
                 end,
 
