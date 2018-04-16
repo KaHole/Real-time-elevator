@@ -18,11 +18,10 @@ watchdog(HallRequestStates, HallRequestTimes, AssignedElevators) ->
             _HallRequestTimes = update_times(Diff, HallRequestTimes),
             watchdog(_HallRequestStates, _HallRequestTimes, _AssignedElevators);
         {kill} ->
-            io:fwrite("Timed out, got killed. ~p~n.", [self()]),
+            io:fwrite("Timed out, got killed.~n."),
             exit(whereis(discover), kill),
             stop_elevator(),
             net_kernel:stop(),
-            io:fwrite("Quarantine.. ~n"),
             timer:sleep(?QUARANTINE),
             init:restart(),
             ok
