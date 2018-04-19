@@ -17,7 +17,7 @@ merge_requests(#hallRequest{state=nothing} = HallRequest1, #hallRequest{state=no
 
 merge_requests(#hallRequest{state=nothing}, #hallRequest{state=new} = HallRequest2) -> HallRequest2;
 
-merge_requests(#hallRequest{state=nothing}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
+%merge_requests(#hallRequest{state=nothing}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
 merge_requests(#hallRequest{state=new}, #hallRequest{state=accepted} = HallRequest2) -> HallRequest2;
 
