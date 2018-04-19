@@ -2,4 +2,4 @@
 
 epmd -daemon
 
-./bin/elevator-1.0.0
+./bin/elevator-1.0.2
