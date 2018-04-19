@@ -5,7 +5,7 @@
 -export([start/2, stop/1]).
 
 -define(NUM_FLOORS, 4).
--define(TICKTIME, 15000).
+-define(TICKTIME, 3000). % ticktime is 1/4 of the node-timeout-time
 
 start(_StartType, _StartArgs) ->
 
