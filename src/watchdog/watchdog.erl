@@ -3,7 +3,7 @@
 -export([start/1]).
 
 -define(TIMEOUT, 25). % Hall-request timeout, in seconds (unix time)
--define(QUARANTINE, 10000). % Quarantine for a timed out node in milliseconds
+-define(QUARANTINE, 15000). % Quarantine for a timed out node in milliseconds
 
 start(HallRequestState) -> 
     register(watchdog, 

@@ -8,6 +8,6 @@
 }).
 
 -record(hallRequest, {
-    state = nothing ::atom(), % nothing, new, accepted, done
+    state = unknown ::atom(), % unknown, nothing, new, accepted, done
     observedBy = [] ::[atom()]
 }).
