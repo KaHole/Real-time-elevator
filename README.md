@@ -1,16 +1,6 @@
 Real-time elevator system for TTK4145
 =====
-[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
 [![Build Status](https://travis-ci.com/TTK4145/project-wrong_on_so_many_levels.svg?token=VaZNdDabsDWKmoAAY6fP&branch=master)](https://travis-ci.com/TTK4145/project-wrong_on_so_many_levels)
-
-
-![elevator stairs](https://media.giphy.com/media/CYEadxFZFtcNG/giphy.gif)
-
-Architecture
-----
-![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/raw/master/doc/Sanntid_moduler.png)
-
-----
 
 # Running the release
 
@@ -26,6 +16,12 @@ Architecture
     $ rebar3 compile
 ## Release
     $ rebar3 release
+
+Architecture
+----
+![Elevator diagram](https://github.com/TTK4145/project-wrong_on_so_many_levels/raw/master/doc/Sanntid_moduler.png)
+
+----
 
 # Built using
 - `Erlang`
